@@ -1,0 +1,9 @@
+export { default as AdminDashboard } from './Dashboard';
+export { default as UsersManagement } from './users';
+export { default as CreateUser } from './users/CreateUser';
+export { default as EditUser } from './users/EditUser';
+export { default as UserDetails } from './users/UserDetails';
+export { default as CoursesManagement } from './courses';
+export { default as Analytics } from './analytics';
+export { default as Settings } from './Settings';
+export { default as Reports } from './Reports';

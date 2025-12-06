@@ -1,0 +1,32 @@
+import React from 'react';
+import { FiHeart } from 'react-icons/fi';
+
+const Footer = () => {
+  return (
+    <footer className="bg-white border-t border-gray-200 mt-auto">
+      <div className="max-w-7xl mx-auto px-6 py-6">
+        <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
+          <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <span>© 2025 Sri Eshwar College of Engineering.</span>
+            <span><i> @ vasanth</i></span>
+            <span className="hidden md:inline">All rights reserved.</span>
+          </div>
+
+          <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <span>Made with</span>
+            <FiHeart className="w-4 h-4 text-red-500 fill-current" />
+            <span>for SECE Community</span>
+          </div>
+
+          <div className="flex items-center space-x-6 text-sm">
+            <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">Privacy</a>
+            <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">Terms</a>
+            <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">Support</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;

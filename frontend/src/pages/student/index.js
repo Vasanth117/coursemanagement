@@ -1,0 +1,12 @@
+export { default as Dashboard } from './Dashboard';
+export { default as CoursesIndex } from './courses/index';
+export { default as MyCourses } from './courses/MyCourses';
+export { default as CourseDetails } from './courses/CourseDetails';
+export { default as EnrollCourse } from './courses/EnrollCourse';
+export { default as AssignmentsIndex } from './assignments/index';
+export { default as AssignmentDetails } from './assignments/AssignmentDetails';
+export { default as SubmitAssignment } from './assignments/SubmitAssignment';
+export { default as GradesIndex } from './grades/index';
+export { default as Schedule } from './Schedule';
+export { default as Profile } from './Profile';
+export { default as Notifications } from './Notifications';
