@@ -12,11 +12,7 @@ const Footer = () => {
             <span className="hidden md:inline">All rights reserved.</span>
           </div>
 
-          <div className="flex items-center space-x-2 text-sm text-gray-600">
-            <span>Made with</span>
-            <FiHeart className="w-4 h-4 text-red-500 fill-current" />
-            <span>for SECE Community</span>
-          </div>
+        
 
           <div className="flex items-center space-x-6 text-sm">
             <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">Privacy</a>
