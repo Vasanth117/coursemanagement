@@ -66,8 +66,7 @@ const LoginForm = ({ role }) => {
         Sign In
       </PrimaryButton>
       
-      {/* Google Login - Disabled */}
-      {/* {process.env.NODE_ENV === 'development' && <GoogleLoginButton role={role} />} */}
+      <GoogleLoginButton role={role} />
     </form>
   );
 };
