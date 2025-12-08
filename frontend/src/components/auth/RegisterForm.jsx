@@ -51,7 +51,9 @@ const RegisterForm = ({ role }) => {
       setTimeout(() => navigate('/login'), 2000);
     } catch (error) {
       console.error('Registration error:', error);
-      setErrors({ general: error.error || error.message || 'Registration failed' });
+      console.error('Error details:', JSON.stringify(error, null, 2));
+      const errorMsg = error?.error || error?.message || error?.response?.data?.error || 'Registration failed';
+      setErrors({ general: errorMsg });
     } finally {
       setLoading(false);
     }
