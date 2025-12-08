@@ -125,3 +125,5 @@
 {"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mServer running on port 5001 in development mode\u001b[39m","timestamp":"2025-12-07 20:29:17:2917"}
 {"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMongoDB Connected: localhost\u001b[39m","timestamp":"2025-12-08 08:50:07:507"}
 {"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mServer running on port 5001 in development mode\u001b[39m","timestamp":"2025-12-08 08:50:07:507"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMongoDB Connected: localhost\u001b[39m","timestamp":"2025-12-08 10:37:31:3731"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mServer running on port 5001 in development mode\u001b[39m","timestamp":"2025-12-08 10:37:31:3731"}
