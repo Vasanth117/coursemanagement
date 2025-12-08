@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../../store/slices/authSlice';
 import { InputField, PrimaryButton, ErrorMessage } from '../common';
 import { FiMail, FiLock } from 'react-icons/fi';
+import GoogleLoginButton from './GoogleLoginButton';
 
 const LoginForm = ({ role }) => {
   const dispatch = useDispatch();
@@ -26,7 +27,8 @@ const LoginForm = ({ role }) => {
       await dispatch(loginUser({ ...formData, role })).unwrap();
       navigate(`/${role}/dashboard`);
     } catch (error) {
-      setErrors({ general: error.message || 'Login failed' });
+      console.error('Login error:', error);
+      setErrors({ general: error || 'Login failed' });
     } finally {
       setLoading(false);
     }
@@ -63,6 +65,8 @@ const LoginForm = ({ role }) => {
       <PrimaryButton type="submit" loading={loading} fullWidth>
         Sign In
       </PrimaryButton>
+      
+      <GoogleLoginButton role={role} />
     </form>
   );
 };

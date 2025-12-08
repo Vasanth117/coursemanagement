@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../../store/slices/authSlice';
+import { authAPI } from '../../api/auth';
 import { InputField, SelectField, PrimaryButton, SecondaryButton, ErrorMessage, SuccessMessage } from '../common';
 import { FiUser, FiMail, FiLock, FiPhone } from 'react-icons/fi';
 
@@ -45,12 +46,12 @@ const RegisterForm = ({ role }) => {
     setErrors({});
 
     try {
-      // Register API call would go here
-      // await dispatch(registerUser({ ...formData, role })).unwrap();
+      await authAPI.register({ ...formData, role });
       setSuccess(true);
       setTimeout(() => navigate('/login'), 2000);
     } catch (error) {
-      setErrors({ general: error.message || 'Registration failed' });
+      console.error('Registration error:', error);
+      setErrors({ general: error.error || error.message || 'Registration failed' });
     } finally {
       setLoading(false);
     }

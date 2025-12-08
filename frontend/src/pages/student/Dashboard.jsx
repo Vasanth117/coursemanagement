@@ -13,12 +13,14 @@ const Dashboard = () => {
 
   const { data: upcomingAssignments } = useQuery({
     queryKey: ['upcomingAssignments'],
-    queryFn: studentAPI.getUpcomingAssignments
+    queryFn: studentAPI.getUpcomingAssignments,
+    enabled: !!stats
   });
 
   const { data: announcements } = useQuery({
     queryKey: ['recentAnnouncements'],
-    queryFn: studentAPI.getAnnouncements
+    queryFn: studentAPI.getAnnouncements,
+    enabled: !!stats
   });
 
   if (isLoading) return <LoadingSpinner />;

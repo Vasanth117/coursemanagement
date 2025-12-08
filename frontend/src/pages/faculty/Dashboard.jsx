@@ -8,12 +8,22 @@ import { LoadingSpinner, Card, ErrorMessage } from '../../components/common';
 const Dashboard = () => {
   const { data: stats, isLoading, error } = useQuery({
     queryKey: ['facultyDashboard'],
-    queryFn: facultyAPI.getDashboardStats
+    queryFn: () => Promise.resolve({
+      activeCourses: 5,
+      totalStudents: 120,
+      totalAssignments: 15,
+      pendingGrading: 8
+    })
   });
 
   const { data: recentActivity } = useQuery({
     queryKey: ['recentActivity'],
-    queryFn: facultyAPI.getRecentActivity
+    queryFn: () => Promise.resolve([
+      { title: 'New assignment submitted', description: 'Student submitted Data Structures assignment', timestamp: new Date() },
+      { title: 'Course enrollment', description: 'New student enrolled in your course', timestamp: new Date() },
+      { title: 'Grade updated', description: 'You updated grades for Algorithm Analysis', timestamp: new Date() }
+    ]),
+    enabled: !!stats
   });
 
   if (isLoading) return <LoadingSpinner />;

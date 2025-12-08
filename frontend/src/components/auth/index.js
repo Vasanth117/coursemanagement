@@ -4,3 +4,4 @@ export { default as RoleSelector } from './RoleSelector';
 export { default as ForgotPasswordForm } from './ForgotPasswordForm';
 export { default as ResetPasswordForm } from './ResetPasswordForm';
 export { default as ProtectedRoute } from './ProtectedRoute';
+export { default as GoogleLoginButton } from './GoogleLoginButton';
