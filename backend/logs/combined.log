@@ -129,3 +129,31 @@
 {"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mServer running on port 5001 in development mode\u001b[39m","timestamp":"2025-12-08 10:37:31:3731"}
 {"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMongoDB Connected: localhost\u001b[39m","timestamp":"2025-12-08 11:53:34:5334"}
 {"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mServer running on port 5001 in development mode\u001b[39m","timestamp":"2025-12-08 11:53:34:5334"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMongoDB Connected: localhost\u001b[39m","timestamp":"2026-02-18 11:03:10:310"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mServer running on port 5001 in development mode\u001b[39m","timestamp":"2026-02-18 11:03:10:310"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMongoDB Connected: localhost\u001b[39m","timestamp":"2026-02-18 14:24:33:2433"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mServer running on port 5001 in development mode\u001b[39m","timestamp":"2026-02-18 14:24:33:2433"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMongoDB Connected: localhost\u001b[39m","timestamp":"2026-02-18 14:40:52:4052"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mServer running on port 5001 in development mode\u001b[39m","timestamp":"2026-02-18 14:40:52:4052"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMongoDB Connected: localhost\u001b[39m","timestamp":"2026-02-18 14:43:16:4316"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mServer running on port 5001 in development mode\u001b[39m","timestamp":"2026-02-18 14:43:16:4316"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMongoDB Connected: localhost\u001b[39m","timestamp":"2026-02-18 14:45:32:4532"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mServer running on port 5001 in development mode\u001b[39m","timestamp":"2026-02-18 14:45:32:4532"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMongoDB Connected: localhost\u001b[39m","timestamp":"2026-02-18 14:51:13:5113"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mServer running on port 5001 in development mode\u001b[39m","timestamp":"2026-02-18 14:51:13:5113"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMongoDB Connected: localhost\u001b[39m","timestamp":"2026-02-18 14:54:19:5419"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMongoDB Connected: localhost\u001b[39m","timestamp":"2026-02-18 14:55:21:5521"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mServer running on port 5001 in development mode\u001b[39m","timestamp":"2026-02-18 14:55:21:5521"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMongoDB Connected: localhost\u001b[39m","timestamp":"2026-02-18 23:29:13:2913"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mServer running on port 5001 in development mode\u001b[39m","timestamp":"2026-02-18 23:29:13:2913"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMongoDB Connected: localhost\u001b[39m","timestamp":"2026-02-18 23:37:58:3758"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMongoDB Connected: localhost\u001b[39m","timestamp":"2026-02-18 23:39:14:3914"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mServer running on port 5002 in development mode\u001b[39m","timestamp":"2026-02-18 23:39:14:3914"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMongoDB Connected: localhost\u001b[39m","timestamp":"2026-02-18 23:41:22:4122"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMongoDB Connected: localhost\u001b[39m","timestamp":"2026-02-18 23:41:22:4122"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mServer running on port 5002 in development mode\u001b[39m","timestamp":"2026-02-18 23:41:22:4122"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMongoDB Connected: localhost\u001b[39m","timestamp":"2026-02-18 23:52:17:5217"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mServer running on port 5002 in development mode\u001b[39m","timestamp":"2026-02-18 23:52:17:5217"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMongoDB Connected: localhost\u001b[39m","timestamp":"2026-02-19 00:04:34:434"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mServer running on port 5002 in development mode\u001b[39m","timestamp":"2026-02-19 00:04:34:434"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMongoDB Connected: localhost\u001b[39m","timestamp":"2026-02-19 00:05:00:50"}

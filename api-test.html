@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Management System - API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-online { background-color: #28a745; }
+        .status-offline { background-color: #dc3545; }
+        .status-unknown { background-color: #ffc107; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 Course Management System - API Test</h1>
+        
+        <div class="test-section">
+            <h3>Server Status</h3>
+            <p>
+                <span id="backend-status" class="status-indicator status-unknown"></span>
+                Backend Server: <span id="backend-text">Checking...</span>
+            </p>
+            <p>
+                <span id="frontend-status" class="status-indicator status-unknown"></span>
+                Frontend Server: <span id="frontend-text">Checking...</span>
+            </p>
+            <button onclick="checkServerStatus()">Refresh Status</button>
+        </div>
+
+        <div class="test-section">
+            <h3>API Endpoints Test</h3>
+            <button onclick="testAllEndpoints()">Test All Endpoints</button>
+            <button onclick="testAuth()">Test Authentication</button>
+            <button onclick="clearResults()">Clear Results</button>
+            <div id="api-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Quick Actions</h3>
+            <button onclick="openFrontend()">Open Frontend</button>
+            <button onclick="openBackend()">Open Backend API</button>
+            <button onclick="openHealth()">Check Health</button>
+        </div>
+
+        <div class="test-section">
+            <h3>Configuration</h3>
+            <p><strong>Backend URL:</strong> <span id="backend-url">http://localhost:5002</span></p>
+            <p><strong>Frontend URL:</strong> <span id="frontend-url">http://localhost:3000</span></p>
+            <p><strong>API Base:</strong> <span id="api-base">http://localhost:5002/api/v1</span></p>
+        </div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:5002';
+        const FRONTEND_URL = 'http://localhost:3000';
+        const API_BASE = `${BACKEND_URL}/api/v1`;
+
+        async function checkServerStatus() {
+            // Check Backend
+            try {
+                const response = await fetch(`${BACKEND_URL}/health`, { 
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                if (response.ok) {
+                    document.getElementById('backend-status').className = 'status-indicator status-online';
+                    document.getElementById('backend-text').textContent = 'Online';
+                } else {
+                    throw new Error('Server responded with error');
+                }
+            } catch (error) {
+                document.getElementById('backend-status').className = 'status-indicator status-offline';
+                document.getElementById('backend-text').textContent = 'Offline';
+            }
+
+            // Check Frontend (this page itself indicates frontend is working)
+            document.getElementById('frontend-status').className = 'status-indicator status-online';
+            document.getElementById('frontend-text').textContent = 'Online (This page is working)';
+        }
+
+        async function testAllEndpoints() {
+            const results = document.getElementById('api-results');
+            results.innerHTML = '<h4>Testing API Endpoints...</h4>';
+
+            const endpoints = [
+                { name: 'Health Check', url: `${BACKEND_URL}/health` },
+                { name: 'API Root', url: `${BACKEND_URL}/api` },
+                { name: 'API v1', url: `${API_BASE}` },
+                { name: 'Auth Test', url: `${API_BASE}/auth/test` },
+            ];
+
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(endpoint.url, {
+                        method: 'GET',
+                        mode: 'cors'
+                    });
+                    
+                    const data = await response.json();
+                    const status = response.ok ? 'success' : 'error';
+                    
+                    results.innerHTML += `
+                        <div class="test-section ${status}">
+                            <strong>${endpoint.name}</strong>: ${response.status} ${response.statusText}
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                } catch (error) {
+                    results.innerHTML += `
+                        <div class="test-section error">
+                            <strong>${endpoint.name}</strong>: Failed
+                            <pre>Error: ${error.message}</pre>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        async function testAuth() {
+            const results = document.getElementById('api-results');
+            results.innerHTML = '<h4>Testing Authentication...</h4>';
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/test-post`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ test: 'authentication' }),
+                    mode: 'cors'
+                });
+
+                const data = await response.json();
+                const status = response.ok ? 'success' : 'error';
+                
+                results.innerHTML += `
+                    <div class="test-section ${status}">
+                        <strong>POST Test</strong>: ${response.status} ${response.statusText}
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                results.innerHTML += `
+                    <div class="test-section error">
+                        <strong>POST Test</strong>: Failed
+                        <pre>Error: ${error.message}</pre>
+                    </div>
+                `;
+            }
+        }
+
+        function clearResults() {
+            document.getElementById('api-results').innerHTML = '';
+        }
+
+        function openFrontend() {
+            window.open(FRONTEND_URL, '_blank');
+        }
+
+        function openBackend() {
+            window.open(`${API_BASE}`, '_blank');
+        }
+
+        function openHealth() {
+            window.open(`${BACKEND_URL}/health`, '_blank');
+        }
+
+        // Auto-check status on page load
+        window.onload = function() {
+            checkServerStatus();
+        };
+    </script>
+</body>
+</html>

@@ -4,6 +4,7 @@ import api from './axiosConfig';
 export const studentAPI = {
   // Dashboard
   getDashboardStats: () => api.get('/student/dashboard'),
+  getUpcomingAssignments: () => api.get('/student/assignments?status=pending&limit=5'),
   
   // Courses
   getEnrolledCourses: () => api.get('/student/courses'),
