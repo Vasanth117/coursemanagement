@@ -52,9 +52,7 @@ exports.validateCourse = [
 
 // Enrollment validation rules
 exports.validateEnrollment = [
-  body('student').isMongoId().withMessage('Valid student ID is required'),
-  body('course').isMongoId().withMessage('Valid course ID is required'),
-  body('status').optional().isIn(['pending', 'enrolled', 'completed', 'dropped', 'rejected']).withMessage('Invalid status')
+  body('courseId').isMongoId().withMessage('Valid course ID is required')
 ];
 
 // Assignment validation rules

@@ -8,6 +8,9 @@ export const studentAPI = {
   
   // Courses
   getEnrolledCourses: () => api.get('/student/courses'),
+  getAvailableCourses: () => api.get('/student/courses/available'),
+  // Course preview (for enrollment)
+  getCoursePreview: (id) => api.get(`/student/courses/${id}/preview`),
   getCourseDetails: (id) => api.get(`/student/courses/${id}`),
   enrollCourse: (courseId) => api.post('/student/enroll', { courseId }),
   unenrollCourse: (enrollmentId) => api.delete(`/student/enrollments/${enrollmentId}`),

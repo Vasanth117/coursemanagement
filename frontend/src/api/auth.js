@@ -6,7 +6,11 @@ export const authAPI = {
   register: (userData) => api.post('/auth/register', userData).then(res => res.data),
   
   // Login user
-  login: (credentials) => api.post('/auth/login', credentials).then(res => res.data),
+  login: (credentials) => api.post('/auth/login', { 
+    email: credentials.email, 
+    password: credentials.password,
+    role: credentials.role
+  }).then(res => res.data),
   
   // Google login
   googleLogin: (data) => api.post('/auth/google-login', data).then(res => res.data),

@@ -9,9 +9,9 @@ const CourseDetails = () => {
   const { id } = useParams();
   const [activeTab, setActiveTab] = useState('overview');
 
-  const { data: course, isLoading } = useQuery({
-    queryKey: ['courseDetails', id],
-    queryFn: () => studentAPI.getCourseDetails(id)
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['coursePreview', id],
+    queryFn: () => studentAPI.getCoursePreview(id)
   });
 
   const { data: assignments } = useQuery({
@@ -26,7 +26,7 @@ const CourseDetails = () => {
     enabled: !!id
   });
 
-  if (isLoading) return <LoadingSpinner />;
+  const course = data?.data || data;
 
   const tabs = [
     { id: 'overview', label: 'Overview' },
@@ -34,16 +34,31 @@ const CourseDetails = () => {
     { id: 'resources', label: `Resources (${resources?.length || 0})` }
   ];
 
+  if (isLoading) return <LoadingSpinner />;
+  
+  if (error || !course) {
+    return (
+      <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
+        <Card>
+          <div className="text-center py-8">
+            <p className="text-red-600 mb-4">Course not found or you don't have access to view this course.</p>
+            <Button variant="secondary" onClick={() => window.history.back()}>Go Back</Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
           <div className="flex items-center space-x-3 mb-2">
-            <h1 className="text-3xl font-bold text-gray-900">{course.title}</h1>
-            <Badge variant="primary">{course.courseCode}</Badge>
+            <h1 className="text-3xl font-bold text-gray-900">{course?.title || 'Course Title'}</h1>
+            <Badge variant="primary">{course?.courseCode || course?.code || 'N/A'}</Badge>
           </div>
-          <p className="text-gray-600">{course.department} • {course.credits} Credits</p>
+          <p className="text-gray-600">{course?.department || 'N/A'} • {course?.credits || 'N/A'} Credits</p>
         </div>
       </div>
 
@@ -54,7 +69,7 @@ const CourseDetails = () => {
             <FiBook className="h-6 w-6 text-blue-600" />
             <div>
               <p className="text-sm text-gray-600">Credits</p>
-              <p className="text-2xl font-bold text-gray-900">{course.credits}</p>
+              <p className="text-2xl font-bold text-gray-900">{course?.credits || 0}</p>
             </div>
           </div>
         </Card>
@@ -81,7 +96,7 @@ const CourseDetails = () => {
             <FiUser className="h-6 w-6 text-orange-600" />
             <div>
               <p className="text-sm text-gray-600">Instructor</p>
-              <p className="text-lg font-bold text-gray-900">{course.faculty?.name}</p>
+              <p className="text-lg font-bold text-gray-900">{course?.faculty?.name || 'N/A'}</p>
             </div>
           </div>
         </Card>
@@ -95,7 +110,7 @@ const CourseDetails = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card className="lg:col-span-2">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Course Description</h2>
-            <p className="text-gray-700 leading-relaxed">{course.description}</p>
+            <p className="text-gray-700 leading-relaxed">{course?.description || 'No description available.'}</p>
           </Card>
           <Card>
             <h2 className="text-xl font-bold text-gray-900 mb-4">Schedule</h2>
@@ -104,29 +119,29 @@ const CourseDetails = () => {
                 <FiCalendar className="h-5 w-5 text-blue-600 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-gray-900">Days</p>
-                  <p className="text-sm text-gray-600">{course.schedule?.days?.join(', ')}</p>
+                  <p className="text-sm text-gray-600">{course?.schedule?.days?.join(', ') || 'N/A'}</p>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
                 <FiClock className="h-5 w-5 text-blue-600 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-gray-900">Time</p>
-                  <p className="text-sm text-gray-600">{course.schedule?.time}</p>
+                  <p className="text-sm text-gray-600">{course?.schedule?.time || 'N/A'}</p>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
                 <FiMapPin className="h-5 w-5 text-blue-600 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-gray-900">Room</p>
-                  <p className="text-sm text-gray-600">{course.schedule?.room}</p>
+                  <p className="text-sm text-gray-600">{course?.schedule?.room || 'N/A'}</p>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
                 <FiUser className="h-5 w-5 text-blue-600 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-gray-900">Instructor</p>
-                  <p className="text-sm text-gray-600">{course.faculty?.name}</p>
-                  <p className="text-xs text-gray-500">{course.faculty?.email}</p>
+                  <p className="text-sm text-gray-600">{course?.faculty?.name || 'N/A'}</p>
+                  <p className="text-xs text-gray-500">{course?.faculty?.email || ''}</p>
                 </div>
               </div>
             </div>

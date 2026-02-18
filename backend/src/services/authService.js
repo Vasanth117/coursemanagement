@@ -23,12 +23,12 @@ class AuthService {
     if (!role) throw new ErrorResponse('Role is required', 400);
 
     // Validate college ID format if provided
-    if (role === 'student' && studentId && !/^\d{6,10}$/.test(studentId)) {
-      throw new ErrorResponse('Valid student ID required (6-10 digits)', 400);
+    if (role === 'student' && studentId && !/^\d{6,12}$/.test(studentId)) {
+      throw new ErrorResponse('Valid student ID required (6-12 digits)', 400);
     }
     
-    if ((role === 'faculty' || role === 'admin') && employeeId && !/^EMP\d{4,6}$/.test(employeeId)) {
-      throw new ErrorResponse('Valid employee ID required (EMP + 4-6 digits)', 400);
+    if ((role === 'faculty' || role === 'admin') && employeeId && !/^(EMP|FAC|ADM)\d{3,8}$/.test(employeeId)) {
+      throw new ErrorResponse('Valid employee ID required (EMP/FAC/ADM + 3-8 digits)', 400);
     }
 
     // Check if user exists

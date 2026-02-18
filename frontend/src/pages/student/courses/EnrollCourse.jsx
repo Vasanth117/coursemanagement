@@ -11,10 +11,12 @@ const EnrollCourse = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { data: course, isLoading } = useQuery({
-    queryKey: ['courseDetails', id],
-    queryFn: () => studentAPI.getCourseDetails(id)
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['coursePreview', id],
+    queryFn: () => studentAPI.getCoursePreview(id)
   });
+
+  const course = data?.data || data;
 
   const enrollMutation = useMutation({
     mutationFn: () => studentAPI.enrollCourse(id),
@@ -23,35 +25,51 @@ const EnrollCourse = () => {
       toast.success('Successfully enrolled in course!');
       navigate('/student/courses/my-courses');
     },
-    onError: () => toast.error('Failed to enroll in course')
+    onError: (error) => {
+      console.error('Enrollment error:', error);
+      const message = error?.message || error?.response?.data?.message || 'Failed to enroll in course';
+      toast.error(message);
+    }
   });
 
   if (isLoading) return <LoadingSpinner />;
+  if (error || !course) {
+    return (
+      <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
+        <Card>
+          <div className="text-center py-8">
+            <p className="text-red-600 mb-4">Course not found or you don't have access to view this course.</p>
+            <Button variant="secondary" onClick={() => navigate('/student/courses')}>Back to Courses</Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
       <h1 className="text-3xl font-bold text-gray-900">Enroll in Course</h1>
 
       <Card>
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">{course.title}</h2>
-        <p className="text-gray-600 mb-6">{course.courseCode} • {course.department}</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">{course?.title || 'Course Title'}</h2>
+        <p className="text-gray-600 mb-6">{course?.courseCode || course?.code || 'N/A'} • {course?.department || 'N/A'}</p>
         
         <div className="space-y-4 mb-6">
           <div className="flex justify-between py-3 border-b">
             <span className="font-medium text-gray-700">Credits</span>
-            <span className="text-gray-900">{course.credits}</span>
+            <span className="text-gray-900">{course?.credits || 'N/A'}</span>
           </div>
           <div className="flex justify-between py-3 border-b">
             <span className="font-medium text-gray-700">Instructor</span>
-            <span className="text-gray-900">{course.faculty?.name}</span>
+            <span className="text-gray-900">{course?.faculty?.name || 'N/A'}</span>
           </div>
           <div className="flex justify-between py-3 border-b">
             <span className="font-medium text-gray-700">Schedule</span>
-            <span className="text-gray-900">{course.schedule?.days?.join(', ')} • {course.schedule?.time}</span>
+            <span className="text-gray-900">{course?.schedule?.days?.join(', ') || 'N/A'} • {course?.schedule?.time || 'N/A'}</span>
           </div>
           <div className="flex justify-between py-3">
             <span className="font-medium text-gray-700">Room</span>
-            <span className="text-gray-900">{course.schedule?.room}</span>
+            <span className="text-gray-900">{course?.schedule?.room || 'N/A'}</span>
           </div>
         </div>
 

@@ -33,6 +33,15 @@ router.get('/courses/available',
   studentController.getAvailableCourses
 );
 
+// @route   GET /api/v1/student/courses/:id/preview
+// @desc    Get course preview for enrollment
+// @access  Private/Student
+router.get('/courses/:id/preview',
+  auth.protect,
+  role.studentOnly,
+  studentController.getCoursePreview
+);
+
 // @route   GET /api/v1/student/courses/:id
 // @desc    Get single course details
 // @access  Private/Student

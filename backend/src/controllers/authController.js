@@ -8,7 +8,7 @@ const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // @desc    Register user
 // @route   POST /api/v1/auth/register
-// @access  Public (Admin only in production)
+// @access  Public
 exports.register = asyncHandler(async (req, res, next) => {
   const result = await authService.register(req.body);
 
@@ -195,14 +195,6 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
 
   if (!email) {
     return next(new ErrorResponse('Please provide email address', 400));
-  }
-
-  // Validate college email domain
-  const domain = email.split('@')[1];
-  const allowedDomains = ['admin.college.edu', 'faculty.college.edu', 'student.college.edu', 'college.edu'];
-  
-  if (!allowedDomains.includes(domain)) {
-    return next(new ErrorResponse('Only official college email addresses are supported', 400));
   }
 
   const result = await authService.forgotPassword(email);

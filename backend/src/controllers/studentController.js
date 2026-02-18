@@ -102,11 +102,10 @@ exports.getAvailableCourses = asyncHandler(async (req, res, next) => {
   const enrolledCourses = await Enrollment.find({ student: studentId })
     .distinct('course');
 
-  // Get available courses (not enrolled, active, and not full)
+  // Get available courses (not enrolled and active)
   let query = Course.find({
     _id: { $nin: enrolledCourses },
-    isActive: true,
-    requiresApproval: false
+    isActive: true
   });
 
   // Filter by department
@@ -178,17 +177,15 @@ exports.getAvailableCourses = asyncHandler(async (req, res, next) => {
 });
 
 // @desc    Get enrolled courses
-// @route   GET /api/v1/student/courses/enrolled
+// @route   GET /api/v1/student/courses
 // @access  Private/Student
 exports.getCourses = asyncHandler(async (req, res, next) => {
   const studentId = req.user.id;
 
-  let query = Enrollment.find({ student: studentId });
-
-  // Filter by status
-  if (req.query.status) {
-    query = query.where('status').equals(req.query.status);
-  }
+  let query = Enrollment.find({ 
+    student: studentId,
+    status: { $in: ['enrolled', 'completed'] }
+  });
 
   // Sort
   const sortBy = req.query.sort || '-enrolledAt';
@@ -197,63 +194,34 @@ exports.getCourses = asyncHandler(async (req, res, next) => {
   // Populate course details
   query = query.populate({
     path: 'course',
-    select: 'title code department faculty semester year schedule',
+    select: 'title code description department faculty semester year schedule credits',
     populate: {
       path: 'faculty',
       select: 'name email'
     }
   });
 
-  // Pagination
-  const page = parseInt(req.query.page, 10) || 1;
-  const limit = parseInt(req.query.limit, 10) || 10;
-  const startIndex = (page - 1) * limit;
-  const total = await Enrollment.countDocuments(query);
-
-  query = query.skip(startIndex).limit(limit);
-
   const enrollments = await query;
-
-  // Get grades for each course
-  const enrollmentsWithGrades = await Promise.all(
-    enrollments.map(async (enrollment) => {
-      const grades = await Grade.find({
-        student: studentId,
-        course: enrollment.course._id,
-        status: 'graded'
-      }).select('assignment score maxScore');
-
-      const totalScore = grades.reduce((sum, grade) => sum + (grade.score || 0), 0);
-      const maxScore = grades.reduce((sum, grade) => sum + (grade.maxScore || 0), 0);
-      const averageGrade = maxScore > 0 ? (totalScore / maxScore) * 100 : 0;
-
-      return {
-        ...enrollment.toObject(),
-        grades,
-        averageGrade: Math.round(averageGrade * 100) / 100
-      };
-    })
-  );
 
   res.status(200).json({
     success: true,
-    count: enrollmentsWithGrades.length,
-    pagination: {
-      page,
-      limit,
-      total,
-      pages: Math.ceil(total / limit)
-    },
-    data: enrollmentsWithGrades
+    count: enrollments.length,
+    data: enrollments
   });
 });
 
 // @desc    Enroll in course
-// @route   POST /api/v1/student/courses/:id/enroll
+// @route   POST /api/v1/student/enroll
 // @access  Private/Student
 exports.requestEnrollment = asyncHandler(async (req, res, next) => {
   const studentId = req.user.id;
-  const courseId = req.params.id;
+  const { courseId } = req.body;
+
+  console.log('Enrollment request:', { studentId, courseId });
+
+  if (!courseId) {
+    return next(new ErrorResponse('Course ID is required', 400));
+  }
 
   // Check if course exists and is active
   const course = await Course.findById(courseId);
@@ -280,51 +248,24 @@ exports.requestEnrollment = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Already enrolled in this course', 400));
   }
 
-  // Check prerequisites if any
-  if (course.prerequisites && course.prerequisites.length > 0) {
-    const completedCourses = await Enrollment.find({
-      student: studentId,
-      course: { $in: course.prerequisites },
-      status: 'completed'
-    });
-
-    if (completedCourses.length < course.prerequisites.length) {
-      return next(new ErrorResponse('Prerequisites not met', 400));
-    }
-  }
-
-  // Check if course requires approval
-  let status = course.requiresApproval ? 'pending' : 'enrolled';
-
   // Create enrollment
   const enrollment = await Enrollment.create({
     student: studentId,
     course: courseId,
     enrolledAt: new Date(),
-    status
+    status: 'enrolled',
+    enrolledBy: studentId
   });
 
-  // Add student to course's enrolled students list if auto-enrolled
-  if (!course.requiresApproval) {
-    course.enrolledStudents.push(studentId);
-    await course.save();
-  }
+  // Add student to course's enrolled students list
+  course.enrolledStudents.push(studentId);
+  await course.save();
 
-  // Populate course details
-  await enrollment.populate('course', 'title code department faculty');
-  await enrollment.populate({
-    path: 'course',
-    populate: {
-      path: 'faculty',
-      select: 'name email'
-    }
-  });
+  console.log('Enrollment successful:', enrollment._id);
 
   res.status(201).json({
     success: true,
-    message: status === 'pending' 
-      ? 'Enrollment request submitted. Waiting for approval.' 
-      : 'Successfully enrolled in course',
+    message: 'Successfully enrolled in course',
     data: enrollment
   });
 });
@@ -1065,6 +1006,81 @@ exports.getTranscript = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     data: transcriptData
+  });
+});
+
+// @desc    Get assignment details
+// @route   GET /api/v1/student/assignments/:id
+// @access  Private/Student
+exports.getAssignmentDetails = asyncHandler(async (req, res, next) => {
+  const studentId = req.user.id;
+  const assignmentId = req.params.id;
+
+  const assignment = await Assignment.findById(assignmentId)
+    .populate('course', 'title code')
+    .populate('createdBy', 'name');
+
+  if (!assignment) {
+    return next(new ErrorResponse('Assignment not found', 404));
+  }
+
+  // Check if student is enrolled
+  const enrollment = await Enrollment.findOne({
+    student: studentId,
+    course: assignment.course._id,
+    status: { $in: ['enrolled', 'completed'] }
+  });
+
+  if (!enrollment) {
+    return next(new ErrorResponse('Not enrolled in this course', 403));
+  }
+
+  // Get student's submission
+  const submission = await Grade.findOne({
+    student: studentId,
+    assignment: assignmentId
+  });
+
+  res.status(200).json({
+    success: true,
+    data: {
+      assignment,
+      submission
+    }
+  });
+});
+
+// @desc    Get course details for enrollment (public)
+// @route   GET /api/v1/student/courses/:id/preview
+// @access  Private/Student
+exports.getCoursePreview = asyncHandler(async (req, res, next) => {
+  const courseId = req.params.id;
+
+  // Get course with basic details (no enrollment required)
+  const course = await Course.findById(courseId)
+    .populate('faculty', 'name email phone department')
+    .select('title code description credits department faculty maxStudents enrolledStudents semester year schedule prerequisites isActive');
+
+  if (!course) {
+    return next(new ErrorResponse('Course not found', 404));
+  }
+
+  if (!course.isActive) {
+    return next(new ErrorResponse('Course is not active', 400));
+  }
+
+  // Calculate available seats
+  const availableSeats = course.maxStudents - course.enrolledStudents.length;
+  const enrollmentPercentage = Math.round((course.enrolledStudents.length / course.maxStudents) * 100);
+
+  res.status(200).json({
+    success: true,
+    data: {
+      ...course.toObject(),
+      availableSeats,
+      enrollmentPercentage,
+      isEnrolled: course.enrolledStudents.includes(req.user.id)
+    }
   });
 });
 

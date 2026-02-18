@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { FiArrowLeft, FiSave } from 'react-icons/fi';
 import { Card, InputField, SelectField, TextArea, PrimaryButton, SecondaryButton, Checkbox } from '../../../components/common';
@@ -8,6 +8,7 @@ import { facultyAPI } from '../../../api/faculty';
 
 const CreateCourse = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     title: '',
     code: '',
