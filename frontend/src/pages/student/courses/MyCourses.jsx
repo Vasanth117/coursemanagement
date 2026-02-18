@@ -32,7 +32,7 @@ const MyCourses = () => {
             <FiBook className="h-6 w-6 text-blue-600" />
             <div>
               <p className="text-sm text-gray-600">Total Courses</p>
-              <p className="text-2xl font-bold text-gray-900">{courses?.length || 0}</p>
+              <p className="text-2xl font-bold text-gray-900">{Array.isArray(courses) ? courses.length : 0}</p>
             </div>
           </div>
         </Card>
@@ -42,7 +42,7 @@ const MyCourses = () => {
             <div>
               <p className="text-sm text-gray-600">Total Credits</p>
               <p className="text-2xl font-bold text-gray-900">
-                {courses?.reduce((sum, c) => sum + (c.credits || 0), 0) || 0}
+                {Array.isArray(courses) ? courses.reduce((sum, c) => sum + (c.credits || 0), 0) : 0}
               </p>
             </div>
           </div>
@@ -53,7 +53,7 @@ const MyCourses = () => {
             <div>
               <p className="text-sm text-gray-600">Active</p>
               <p className="text-2xl font-bold text-gray-900">
-                {courses?.filter(c => c.status === 'active').length || 0}
+                {Array.isArray(courses) ? courses.filter(c => c.status === 'active').length : 0}
               </p>
             </div>
           </div>
@@ -64,7 +64,7 @@ const MyCourses = () => {
             <div>
               <p className="text-sm text-gray-600">Completed</p>
               <p className="text-2xl font-bold text-gray-900">
-                {courses?.filter(c => c.status === 'completed').length || 0}
+                {Array.isArray(courses) ? courses.filter(c => c.status === 'completed').length : 0}
               </p>
             </div>
           </div>
@@ -72,7 +72,7 @@ const MyCourses = () => {
       </div>
 
       {/* Courses List */}
-      {courses?.length === 0 ? (
+      {!Array.isArray(courses) || courses.length === 0 ? (
         <EmptyState
           icon={FiBook}
           title="No enrolled courses"
@@ -81,7 +81,7 @@ const MyCourses = () => {
         />
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {courses?.map((course, index) => (
+          {courses.map((course, index) => (
             <Card key={course._id} className="hover:shadow-xl transition-all duration-300 animate-slide-up" style={{ animationDelay: `${index * 100}ms` }}>
               <div className="flex justify-between items-start mb-4">
                 <div>

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5002/api/v1';
+const API_URL = 'http://localhost:5002/api/v1';
 console.log('🔧 API Configuration:', {
   REACT_APP_API_URL: process.env.REACT_APP_API_URL,
   baseURL: API_URL,
@@ -31,7 +31,7 @@ api.interceptors.request.use(
 
 // Response interceptor
 api.interceptors.response.use(
-  (response) => response.data,
+  (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token');

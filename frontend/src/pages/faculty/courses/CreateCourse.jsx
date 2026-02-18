@@ -15,6 +15,7 @@ const CreateCourse = () => {
     credits: 3,
     department: '',
     semester: '',
+    year: new Date().getFullYear(),
     maxStudents: 60,
     schedule: { days: [], time: '', room: '' }
   });
@@ -24,11 +25,17 @@ const CreateCourse = () => {
     mutationFn: (courseData) => facultyAPI.createCourse(courseData),
     onSuccess: () => {
       toast.success('Course created successfully');
+      // Invalidate multiple caches for real-time updates
+      queryClient.invalidateQueries(['facultyCourses']);
+      queryClient.invalidateQueries(['availableCourses']);
+      queryClient.invalidateQueries(['allCourses']);
       navigate('/faculty/courses');
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || 'Failed to create course');
-      setErrors({ general: error.response?.data?.message });
+      console.error('Course creation error:', error);
+      const errorMessage = error?.error || error?.message || 'Failed to create course';
+      toast.error(errorMessage);
+      setErrors({ general: errorMessage });
     },
   });
 
@@ -95,6 +102,19 @@ const CreateCourse = () => {
               onChange={handleChange}
               options={[1, 2, 3, 4, 5].map(n => ({ value: n, label: `${n} Credit${n > 1 ? 's' : ''}` }))}
             />
+            <SelectField
+              label="Semester"
+              name="semester"
+              value={formData.semester}
+              onChange={handleChange}
+              options={[
+                { value: 'Fall', label: 'Fall' },
+                { value: 'Spring', label: 'Spring' },
+                { value: 'Summer', label: 'Summer' }
+              ]}
+              required
+            />
+            <InputField label="Year" name="year" type="number" value={formData.year} onChange={handleChange} error={errors.year} required />
           </div>
           <TextArea label="Description" name="description" value={formData.description} onChange={handleChange} rows={4} required />
         </Card>

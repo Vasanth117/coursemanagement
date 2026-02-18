@@ -17,7 +17,7 @@ const CoursesIndex = () => {
   if (isLoading) return <LoadingSpinner />;
   if (error) return <ErrorMessage message="Failed to load courses" />;
 
-  const filteredCourses = courses?.filter(course => {
+  const filteredCourses = (courses || []).filter(course => {
     const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          course.courseCode.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || course.status === statusFilter;
@@ -63,7 +63,7 @@ const CoursesIndex = () => {
       </Card>
 
       {/* Courses Grid */}
-      {filteredCourses?.length === 0 ? (
+      {filteredCourses.length === 0 ? (
         <EmptyState
           icon={FiBook}
           title="No courses found"
@@ -72,7 +72,7 @@ const CoursesIndex = () => {
         />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredCourses?.map((course, index) => (
+          {filteredCourses.map((course, index) => (
             <Card key={course._id} className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1 animate-slide-up" style={{ animationDelay: `${index * 100}ms` }}>
               <div className="flex justify-between items-start mb-4">
                 <Badge variant={course.status === 'active' ? 'success' : course.status === 'pending' ? 'warning' : 'default'}>

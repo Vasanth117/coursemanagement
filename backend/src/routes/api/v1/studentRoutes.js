@@ -24,6 +24,24 @@ router.get('/courses',
   studentController.getCourses
 );
 
+// @route   GET /api/v1/student/courses/available
+// @desc    Get available courses for enrollment
+// @access  Private/Student
+router.get('/courses/available',
+  auth.protect,
+  role.studentOnly,
+  studentController.getAvailableCourses
+);
+
+// @route   GET /api/v1/student/courses/:id
+// @desc    Get single course details
+// @access  Private/Student
+router.get('/courses/:id',
+  auth.protect,
+  role.studentOnly,
+  studentController.getCourseDetails
+);
+
 // @route   POST /api/v1/student/enroll
 // @desc    Request course enrollment
 // @access  Private/Student
@@ -44,6 +62,24 @@ router.get('/assignments',
   validation.validatePagination,
   validation.handleValidationErrors,
   studentController.getAssignments
+);
+
+// @route   GET /api/v1/student/assignments/:id
+// @desc    Get single assignment details
+// @access  Private/Student
+router.get('/assignments/:id',
+  auth.protect,
+  role.studentOnly,
+  studentController.getAssignmentDetails
+);
+
+// @route   POST /api/v1/student/assignments/:id/submit
+// @desc    Submit assignment
+// @access  Private/Student
+router.post('/assignments/:id/submit',
+  auth.protect,
+  role.studentOnly,
+  studentController.submitAssignment
 );
 
 // @route   GET /api/v1/student/grades

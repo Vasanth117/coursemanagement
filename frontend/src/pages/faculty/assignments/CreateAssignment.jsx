@@ -27,7 +27,10 @@ const CreateAssignment = () => {
   const createMutation = useMutation({
     mutationFn: facultyAPI.createAssignment,
     onSuccess: () => {
+      // Invalidate caches for real-time updates
       queryClient.invalidateQueries(['facultyAssignments']);
+      queryClient.invalidateQueries(['studentAssignments']);
+      queryClient.invalidateQueries(['upcomingAssignments']);
       toast.success('Assignment created successfully');
       navigate('/faculty/assignments');
     },
@@ -65,11 +68,11 @@ const CreateAssignment = () => {
                 className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">Select Course</option>
-                {courses?.map((course) => (
+                {Array.isArray(courses) ? courses.map((course) => (
                   <option key={course._id} value={course._id}>
                     {course.courseCode} - {course.title}
                   </option>
-                ))}
+                )) : []}
               </select>
             </div>
 

@@ -24,6 +24,24 @@ router.get('/courses',
   facultyController.getCourses
 );
 
+// @route   GET /api/v1/faculty/courses/:id
+// @desc    Get single faculty course
+// @access  Private/Faculty
+router.get('/courses/:id',
+  auth.protect,
+  role.facultyOnly,
+  facultyController.getFacultyCourse
+);
+
+// @route   POST /api/v1/faculty/courses
+// @desc    Create new course
+// @access  Private/Faculty
+router.post('/courses',
+  auth.protect,
+  role.facultyOnly,
+  facultyController.createCourse
+);
+
 // @route   GET /api/v1/faculty/students
 // @desc    Get faculty students
 // @access  Private/Faculty
@@ -44,6 +62,15 @@ router.get('/assignments',
   validation.validatePagination,
   validation.handleValidationErrors,
   facultyController.getAssignments
+);
+
+// @route   POST /api/v1/faculty/assignments
+// @desc    Create new assignment
+// @access  Private/Faculty
+router.post('/assignments',
+  auth.protect,
+  role.facultyOnly,
+  facultyController.createAssignment
 );
 
 // @route   GET /api/v1/faculty/submissions

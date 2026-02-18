@@ -14,13 +14,13 @@ const AssignmentsIndex = () => {
     queryFn: facultyAPI.getAssignments
   });
 
-  const filteredAssignments = assignments?.filter(assignment => {
+  const filteredAssignments = Array.isArray(assignments) ? assignments.filter(assignment => {
     const matchesSearch = assignment.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || 
       (statusFilter === 'active' && new Date(assignment.dueDate) > new Date()) ||
       (statusFilter === 'overdue' && new Date(assignment.dueDate) <= new Date());
     return matchesSearch && matchesStatus;
-  });
+  }) : [];
 
   if (isLoading) return <LoadingSpinner />;
 
@@ -43,7 +43,7 @@ const AssignmentsIndex = () => {
             <FiFileText className="h-6 w-6 text-blue-600" />
             <div>
               <p className="text-sm text-gray-600">Total</p>
-              <p className="text-2xl font-bold text-gray-900">{assignments?.length || 0}</p>
+              <p className="text-2xl font-bold text-gray-900">{Array.isArray(assignments) ? assignments.length : 0}</p>
             </div>
           </div>
         </Card>
@@ -53,7 +53,7 @@ const AssignmentsIndex = () => {
             <div>
               <p className="text-sm text-gray-600">Active</p>
               <p className="text-2xl font-bold text-gray-900">
-                {assignments?.filter(a => new Date(a.dueDate) > new Date()).length || 0}
+                {Array.isArray(assignments) ? assignments.filter(a => new Date(a.dueDate) > new Date()).length : 0}
               </p>
             </div>
           </div>
@@ -64,7 +64,7 @@ const AssignmentsIndex = () => {
             <div>
               <p className="text-sm text-gray-600">Pending Grading</p>
               <p className="text-2xl font-bold text-gray-900">
-                {assignments?.reduce((sum, a) => sum + (a.pendingSubmissions || 0), 0)}
+                {Array.isArray(assignments) ? assignments.reduce((sum, a) => sum + (a.pendingSubmissions || 0), 0) : 0}
               </p>
             </div>
           </div>
@@ -75,7 +75,7 @@ const AssignmentsIndex = () => {
             <div>
               <p className="text-sm text-gray-600">Overdue</p>
               <p className="text-2xl font-bold text-gray-900">
-                {assignments?.filter(a => new Date(a.dueDate) <= new Date()).length || 0}
+                {Array.isArray(assignments) ? assignments.filter(a => new Date(a.dueDate) <= new Date()).length : 0}
               </p>
             </div>
           </div>
@@ -108,7 +108,7 @@ const AssignmentsIndex = () => {
       </Card>
 
       {/* Assignments List */}
-      {filteredAssignments?.length === 0 ? (
+      {filteredAssignments.length === 0 ? (
         <EmptyState
           icon={FiFileText}
           title="No assignments found"
@@ -117,7 +117,7 @@ const AssignmentsIndex = () => {
         />
       ) : (
         <div className="space-y-4">
-          {filteredAssignments?.map((assignment, index) => (
+          {filteredAssignments.map((assignment, index) => (
             <Card key={assignment._id} className="hover:shadow-lg transition-all animate-slide-up" style={{ animationDelay: `${index * 50}ms` }}>
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex-1">

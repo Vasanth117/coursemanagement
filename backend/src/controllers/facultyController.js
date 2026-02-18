@@ -190,8 +190,9 @@ exports.getFacultyCourse = asyncHandler(async (req, res, next) => {
 // @route   POST /api/v1/faculty/courses
 // @access  Private/Faculty
 exports.createCourse = asyncHandler(async (req, res, next) => {
-  // Add faculty ID to request body
+  // Add faculty ID and createdBy to request body
   req.body.faculty = req.user.id;
+  req.body.createdBy = req.user.id;
 
   // Validate schedule
   if (req.body.schedule) {

@@ -19,13 +19,13 @@ const StudentsIndex = () => {
     queryFn: facultyAPI.getCourses
   });
 
-  const filteredStudents = students?.filter(student => {
+  const filteredStudents = Array.isArray(students) ? students.filter(student => {
     const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          student.rollNumber?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCourse = courseFilter === 'all' || student.courses?.includes(courseFilter);
     return matchesSearch && matchesCourse;
-  });
+  }) : [];
 
   if (isLoading) return <LoadingSpinner />;
 
@@ -45,7 +45,7 @@ const StudentsIndex = () => {
             <FiUsers className="h-6 w-6 text-blue-600" />
             <div>
               <p className="text-sm text-gray-600">Total Students</p>
-              <p className="text-2xl font-bold text-gray-900">{students?.length || 0}</p>
+              <p className="text-2xl font-bold text-gray-900">{Array.isArray(students) ? students.length : 0}</p>
             </div>
           </div>
         </Card>
@@ -54,7 +54,7 @@ const StudentsIndex = () => {
             <FiUsers className="h-6 w-6 text-indigo-600" />
             <div>
               <p className="text-sm text-gray-600">Active Courses</p>
-              <p className="text-2xl font-bold text-gray-900">{courses?.length || 0}</p>
+              <p className="text-2xl font-bold text-gray-900">{(courses || []).length}</p>
             </div>
           </div>
         </Card>
@@ -64,7 +64,7 @@ const StudentsIndex = () => {
             <div>
               <p className="text-sm text-gray-600">Avg per Course</p>
               <p className="text-2xl font-bold text-gray-900">
-                {courses?.length ? Math.round(students?.length / courses.length) : 0}
+                {(courses || []).length ? Math.round((students || []).length / (courses || []).length) : 0}
               </p>
             </div>
           </div>
@@ -90,17 +90,17 @@ const StudentsIndex = () => {
             className="px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="all">All Courses</option>
-            {courses?.map((course) => (
+            {Array.isArray(courses) ? courses.map((course) => (
               <option key={course._id} value={course._id}>
                 {course.courseCode} - {course.title}
               </option>
-            ))}
+            )) : []}
           </select>
         </div>
       </Card>
 
       {/* Students List */}
-      {filteredStudents?.length === 0 ? (
+      {filteredStudents.length === 0 ? (
         <EmptyState
           icon={FiUsers}
           title="No students found"
@@ -120,7 +120,7 @@ const StudentsIndex = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredStudents?.map((student, index) => (
+                {filteredStudents.map((student, index) => (
                   <tr key={student._id} className="hover:bg-gray-50 animate-slide-up" style={{ animationDelay: `${index * 30}ms` }}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center space-x-3">

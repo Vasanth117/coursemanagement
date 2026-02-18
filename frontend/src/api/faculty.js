@@ -10,17 +10,25 @@ export const facultyAPI = {
   // Courses
   getCourses: async (params = {}) => {
     const response = await api.get('/faculty/courses', { params });
-    return response.data;
+    return Array.isArray(response.data) ? response.data : response.data?.data || [];
   },
 
   getCourseById: async (id) => {
-    const response = await api.get(`/faculty/courses/${id}`);
-    return response.data;
+    try {
+      const response = await api.get(`/faculty/courses/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   },
 
   createCourse: async (courseData) => {
-    const response = await api.post('/faculty/courses', courseData);
-    return response.data;
+    try {
+      const response = await api.post('/faculty/courses', courseData);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   },
 
   updateCourse: async (id, courseData) => {
@@ -36,7 +44,7 @@ export const facultyAPI = {
   // Assignments
   getAssignments: async (params = {}) => {
     const response = await api.get('/faculty/assignments', { params });
-    return response.data;
+    return Array.isArray(response.data) ? response.data : response.data?.data || [];
   },
 
   getAssignmentById: async (id) => {
@@ -72,7 +80,7 @@ export const facultyAPI = {
   // Students
   getStudents: async (params = {}) => {
     const response = await api.get('/faculty/students', { params });
-    return response.data;
+    return Array.isArray(response.data) ? response.data : response.data?.data || [];
   },
 
   getStudentById: async (id) => {
