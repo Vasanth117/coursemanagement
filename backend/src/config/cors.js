@@ -2,7 +2,7 @@ const cors = require('cors');
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
-  'https://yourdomain.com'
+  'https://your-netlify-app.netlify.app'
 ];
 
 const corsOptions = {
