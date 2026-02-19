@@ -27,7 +27,7 @@ const LoginForm = ({ role }) => {
 
     // Test direct API call
     try {
-      const testResponse = await fetch('http://localhost:5002/api/v1/auth/login', {
+      const testResponse = await fetch(`${process.env.REACT_APP_API_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -47,7 +47,7 @@ const LoginForm = ({ role }) => {
 
     try {
       // Direct login without Redux
-      const response = await fetch('http://localhost:5002/api/v1/auth/login', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
