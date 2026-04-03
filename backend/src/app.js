@@ -19,6 +19,11 @@ const app = express();
 // Security middleware
 app.use(helmet());
 
+// Health check endpoint for monitoring
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'OK', timestamp: new Date() });
+});
+
 // CORS configuration
 const allowedOrigins = [
   process.env.CLIENT_URL || 'http://localhost:3000',
