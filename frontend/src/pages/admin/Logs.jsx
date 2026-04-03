@@ -3,8 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import api from '../../api/axiosConfig';
 import { 
   FiDatabase, 
-  FiSearch, 
-  FiFilter, 
   FiActivity, 
   FiAlertCircle, 
   FiCheckCircle, 

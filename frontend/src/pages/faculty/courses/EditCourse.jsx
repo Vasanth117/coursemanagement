@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
 import { facultyAPI } from '../../../api/faculty';
 import { FiSave, FiX } from 'react-icons/fi';
-import { LoadingSpinner, Card, Button, ErrorMessage } from '../../../components/common';
+import { LoadingSpinner, Card, Button } from '../../../components/common';
 import { toast } from 'react-hot-toast';
 
 const EditCourse = () => {

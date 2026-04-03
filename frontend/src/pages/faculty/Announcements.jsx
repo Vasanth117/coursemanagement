@@ -2,12 +2,11 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { facultyAPI } from '../../api/faculty';
 import { FiSend, FiTrash2, FiEdit, FiClock } from 'react-icons/fi';
-import { LoadingSpinner, Card, Button, Badge, Modal } from '../../components/common';
+import { LoadingSpinner, Card, Button, Badge } from '../../components/common';
 import { toast } from 'react-hot-toast';
 
 const Announcements = () => {
   const [formData, setFormData] = useState({ title: '', content: '', course: '', priority: 'normal' });
-  const [editingId, setEditingId] = useState(null);
   const queryClient = useQueryClient();
 
   const { data: courses } = useQuery({
@@ -149,7 +148,7 @@ const Announcements = () => {
                     variant="secondary"
                     size="sm"
                     icon={FiEdit}
-                    onClick={() => setEditingId(announcement._id)}
+                    onClick={() => {}}
                   >
                     Edit
                   </Button>

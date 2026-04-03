@@ -1,10 +1,7 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 import FacultyEnrollmentDashboard from '../../components/enrollment/FacultyEnrollmentDashboard';
 
 const Dashboard = () => {
-  const { user } = useSelector((state) => state.auth);
-
   return (
     <div className="space-y-6">
       <div>

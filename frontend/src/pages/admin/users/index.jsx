@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
-import { FiPlus, FiSearch, FiFilter, FiEdit, FiTrash, FiEye, FiRefreshCw } from 'react-icons/fi';
+import { FiPlus, FiSearch, FiEdit, FiTrash, FiEye, FiRefreshCw } from 'react-icons/fi';
 import { Card, Table, PrimaryButton, SecondaryButton, InputField, SelectField, Badge, Avatar, LoadingSpinner, EmptyState } from '../../../components/common';
 import { adminAPI } from '../../../api/admin';
 
