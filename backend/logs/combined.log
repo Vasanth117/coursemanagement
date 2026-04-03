@@ -483,3 +483,5 @@
 {"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mServer running on port 8000 with WebSocket support\u001b[39m","timestamp":"2026-04-03 18:35:32:3532"}
 {"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMongoDB Connected: localhost\u001b[39m","timestamp":"2026-04-03 19:25:39:2539"}
 {"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mServer running on port 8000 with WebSocket support\u001b[39m","timestamp":"2026-04-03 19:25:39:2539"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMongoDB Connected: localhost\u001b[39m","timestamp":"2026-04-03 19:36:00:360"}
+{"level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mServer running on port 8000 with WebSocket support\u001b[39m","timestamp":"2026-04-03 19:36:00:360"}

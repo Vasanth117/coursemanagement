@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { studentAPI } from '../../../api/student';
-import { FiBook, FiUsers, FiFileText, FiEye, FiCalendar, FiPlay } from 'react-icons/fi';
+import { FiBook, FiUsers, FiFileText, FiCalendar, FiPlay } from 'react-icons/fi';
 import { LoadingSpinner, Card, Badge, EmptyState, Button, ProgressBar } from '../../../components/common';
 
 const MyCourses = () => {

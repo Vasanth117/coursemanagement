@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { facultyAPI } from '../../../api/faculty';
 import { FiSave, FiCalendar, FiCheckCircle, FiXCircle } from 'react-icons/fi';
-import { LoadingSpinner, Card, Button, Badge } from '../../../components/common';
+import { LoadingSpinner, Card, Button } from '../../../components/common';
 import { toast } from 'react-hot-toast';
 
 const Attendance = () => {

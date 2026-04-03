@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { studentAPI } from '../../api/student';
-import { FiCalendar, FiClock, FiMapPin, FiBook } from 'react-icons/fi';
+import { FiClock, FiMapPin, FiBook } from 'react-icons/fi';
 import { LoadingSpinner, Card, Badge } from '../../components/common';
 
 const Schedule = () => {

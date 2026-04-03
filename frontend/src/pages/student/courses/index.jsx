@@ -9,7 +9,7 @@ const CoursesIndex = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('all');
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['availableCourses'],
     queryFn: studentAPI.getAvailableCourses
   });

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { studentAPI } from '../../../api/student';
-import { FiSearch, FiFileText, FiClock, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
+import { FiSearch, FiFileText, FiClock, FiCheckCircle } from 'react-icons/fi';
 import { LoadingSpinner, Card, Badge, EmptyState, Button } from '../../../components/common';
 
 const AssignmentsIndex = () => {

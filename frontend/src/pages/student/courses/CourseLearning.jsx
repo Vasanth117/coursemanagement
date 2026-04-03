@@ -4,15 +4,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { studentAPI } from '../../../api/student';
 import { 
   FiBook, 
-  FiFileText, 
   FiDownload, 
   FiCheckCircle, 
   FiClock, 
-  FiChevronRight, 
   FiArrowLeft,
   FiPlay,
   FiCheck,
-  FiLock,
   FiCalendar,
   FiEye,
   FiUser

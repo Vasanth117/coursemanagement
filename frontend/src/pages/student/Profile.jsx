@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { studentAPI } from '../../api/student';
-import { FiUser, FiMail, FiPhone, FiBook, FiSave } from 'react-icons/fi';
+import { FiUser, FiBook, FiSave } from 'react-icons/fi';
 import { LoadingSpinner, Card, Button, Avatar } from '../../components/common';
 import { toast } from 'react-hot-toast';
 
