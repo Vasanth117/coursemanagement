@@ -21,13 +21,13 @@ const validateConfig = () => {
   const missing = required.filter(key => !process.env[key]);
 
   if (missing.length) {
-    console.error('❌ Cloudinary Configuration Error:'.red);
-    console.error(`Missing environment variables: ${missing.join(', ')}`.yellow);
-    console.error('Please check your .env file.'.yellow);
+    console.error('❌ Cloudinary Configuration Error:');
+    console.error(`Missing environment variables: ${missing.join(', ')}`);
+    console.error('Please check your .env file.');
     // In production, you might want to throw an error or exit
     // throw new Error('Cloudinary configuration is incomplete');
   } else {
-    console.log('✅ Cloudinary configuration loaded successfully.'.green);
+    console.log('✅ Cloudinary configuration loaded successfully.');
   }
 };
 
@@ -113,12 +113,43 @@ const storage = new CloudinaryStorage({
 });
 
 /**
+ * Check if Cloudinary is properly configured.
+ */
+const isCloudinaryConfigured = () => {
+  return process.env.CLOUDINARY_CLOUD_NAME && 
+         process.env.CLOUDINARY_API_KEY && 
+         process.env.CLOUDINARY_API_SECRET;
+};
+
+/**
  * Utility function for direct uploads (useful in controllers).
  * @param {String | Buffer} file - The file path in server uploads/ folder or a buffer.
  * @param {Object} options - Additional Cloudinary upload options.
- * @returns {Promise<Object>} The Cloudinary upload result.
+ * @returns {Promise<Object>} The Cloudinary upload result or local fallback.
  */
 const uploadToCloudinary = async (file, options = {}) => {
+  if (!isCloudinaryConfigured()) {
+    console.warn('⚠️ Cloudinary not configured. Falling back to local storage.');
+    
+    // If file is a path string
+    if (typeof file === 'string') {
+      const baseUrl = process.env.BASE_URL || 'http://localhost:8000';
+      // Normalize path to relative URL
+      const relativePath = file.replace(/\\/g, '/').replace(/^.*uploads\//, 'uploads/');
+      
+      return {
+        secure_url: `${baseUrl}/${relativePath}`,
+        public_id: `local_${path.basename(file)}_${Date.now()}`,
+        resource_type: 'auto',
+        format: path.extname(file).replace('.', '')
+      };
+    }
+    
+    // If file is a Buffer, we can't easily fallback without saving it first, 
+    // but the current use case passes file paths.
+    throw new Error('Cloudinary not configured and buffer upload fallback not implemented.');
+  }
+
   try {
     const uploadOptions = {
       resource_type: 'auto',

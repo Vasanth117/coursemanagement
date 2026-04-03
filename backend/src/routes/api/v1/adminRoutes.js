@@ -86,4 +86,22 @@ router.get('/analytics',
   adminController.getAnalytics
 );
 
+// @route   GET /api/v1/admin/logs
+// @desc    Get system audit logs
+// @access  Private/Admin
+router.get('/logs',
+  auth.protect,
+  role.adminOnly,
+  adminController.getAuditLogs
+);
+
+// @route   GET /api/v1/admin/security
+// @desc    Get system security data
+// @access  Private/Admin
+router.get('/security',
+  auth.protect,
+  role.adminOnly,
+  adminController.getSecurityData
+);
+
 module.exports = router;

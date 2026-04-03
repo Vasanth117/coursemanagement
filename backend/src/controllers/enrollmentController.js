@@ -4,6 +4,105 @@ const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/ErrorResponse');
 const mongoose = require('mongoose');
 
+// @desc    Get faculty enrollments
+// @route   GET /api/v1/faculty/:facultyId/enrollments
+// @access  Private/Faculty or Admin
+exports.getFacultyEnrollments = asyncHandler(async (req, res, next) => {
+  const { facultyId } = req.params;
+
+  // Check authorization
+  const isAdmin = req.user.role === 'admin';
+  const isFacultySelf = req.user.role === 'faculty' && req.user.id === facultyId;
+
+  if (!isAdmin && !isFacultySelf) {
+    return next(new ErrorResponse('Not authorized', 403));
+  }
+
+  // Get faculty courses
+  const facultyCourses = await Course.find({ faculty: facultyId }).distinct('_id');
+
+  // Get enrollments for faculty courses
+  const enrollments = await Enrollment.find({ 
+    course: { $in: facultyCourses } 
+  })
+    .populate('student', 'name email studentId')
+    .populate('course', 'title code')
+    .sort('-enrolledAt')
+    .limit(50);
+
+  // Get total enrollments count
+  const totalEnrollments = await Enrollment.countDocuments({
+    course: { $in: facultyCourses }
+  });
+
+  // Get today's enrollments
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const todayEnrollments = await Enrollment.countDocuments({
+    course: { $in: facultyCourses },
+    enrolledAt: { $gte: today, $lt: tomorrow }
+  });
+
+  res.status(200).json({
+    success: true,
+    data: {
+      enrollments,
+      total: totalEnrollments,
+      today: todayEnrollments
+    }
+  });
+});
+
+// @desc    Get enrollment statistics
+// @route   GET /api/v1/enrollments/stats
+// @access  Private/Admin or Faculty
+exports.getEnrollmentStats = asyncHandler(async (req, res, next) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  // Get total enrollments
+  const total = await Enrollment.countDocuments();
+  
+  // Get enrollments by status
+  const statusStats = await Enrollment.aggregate([
+    {
+      $group: {
+        _id: '$status',
+        count: { $sum: 1 }
+      }
+    }
+  ]);
+
+  // Get today's enrollments
+  const todayEnrollments = await Enrollment.countDocuments({
+    enrolledAt: { $gte: today, $lt: tomorrow }
+  });
+
+  // Format status stats
+  const stats = statusStats.reduce((acc, stat) => {
+    acc[stat._id] = stat.count;
+    return acc;
+  }, {});
+
+  res.status(200).json({
+    success: true,
+    data: {
+      total,
+      enrolled: stats.enrolled || 0,
+      pending: stats.pending || 0,
+      completed: stats.completed || 0,
+      dropped: stats.dropped || 0,
+      rejected: stats.rejected || 0,
+      today: todayEnrollments
+    }
+  });
+});
+
 // @desc    Get all enrollments
 // @route   GET /api/v1/enrollments
 // @access  Private/Admin
@@ -203,6 +302,12 @@ exports.createEnrollment = asyncHandler(async (req, res, next) => {
   await enrollment.populate('course', 'title code department');
   await enrollment.populate('enrolledBy', 'name');
 
+  // Send real-time update
+  const wsService = req.app.get('wsService');
+  if (wsService) {
+    wsService.broadcastEnrollmentUpdate(enrollment);
+  }
+
   res.status(201).json({
     success: true,
     data: enrollment
@@ -304,7 +409,7 @@ exports.deleteEnrollment = asyncHandler(async (req, res, next) => {
     course: enrollment.course
   });
 
-  await enrollment.remove();
+  await enrollment.deleteOne();
 
   res.status(200).json({
     success: true,

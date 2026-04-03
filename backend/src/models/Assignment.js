@@ -90,4 +90,24 @@ AssignmentSchema.pre('save', function(next) {
 AssignmentSchema.index({ course: 1, dueDate: 1 });
 AssignmentSchema.index({ isPublished: 1 });
 
+// Virtual for submissions
+AssignmentSchema.virtual('submissions', {
+  ref: 'Grade',
+  localField: '_id',
+  foreignField: 'assignment',
+  justOne: false
+});
+
+// Virtual for submission count
+AssignmentSchema.virtual('submissionCount', {
+  ref: 'Grade',
+  localField: '_id',
+  foreignField: 'assignment',
+  count: true
+});
+
+// Enable virtuals
+AssignmentSchema.set('toJSON', { virtuals: true });
+AssignmentSchema.set('toObject', { virtuals: true });
+
 module.exports = mongoose.model('Assignment', AssignmentSchema);

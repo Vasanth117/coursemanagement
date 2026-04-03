@@ -7,3 +7,5 @@ export { default as CoursesManagement } from './courses';
 export { default as Analytics } from './analytics';
 export { default as Settings } from './Settings';
 export { default as Reports } from './Reports';
+export { default as SystemLogs } from './Logs';
+export { default as Security } from './Security';

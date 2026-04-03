@@ -266,7 +266,7 @@ exports.deleteAnnouncement = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Not authorized to delete this announcement', 403));
   }
 
-  await announcement.remove();
+  await announcement.deleteOne();
 
   res.status(200).json({
     success: true,

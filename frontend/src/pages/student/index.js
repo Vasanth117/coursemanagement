@@ -10,3 +10,5 @@ export { default as GradesIndex } from './grades/index';
 export { default as Schedule } from './Schedule';
 export { default as Profile } from './Profile';
 export { default as Notifications } from './Notifications';
+export { default as Announcements } from './Announcements';
+export { default as CourseLearning } from './courses/CourseLearning';

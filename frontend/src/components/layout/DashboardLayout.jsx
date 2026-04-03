@@ -4,10 +4,14 @@ import { useSelector } from 'react-redux';
 import { Header } from './Header';
 import { StudentSidebar, FacultySidebar, AdminSidebar } from './Sidebar';
 import { Footer } from './Footer';
+import useWebSocket from '../../hooks/useWebSocket';
 
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user } = useSelector((state) => state.auth);
+
+  // Initialize WebSocket for real-time updates
+  useWebSocket();
 
   const getSidebar = () => {
     switch (user?.role) {

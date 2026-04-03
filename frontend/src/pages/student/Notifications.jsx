@@ -30,9 +30,11 @@ const Notifications = () => {
     }
   });
 
-  const filteredNotifications = notifications?.filter(n => {
-    if (filter === 'unread') return !n.read;
-    if (filter === 'read') return n.read;
+  const notificationsList = notifications?.data || [];
+
+  const filteredNotifications = notificationsList.filter(n => {
+    if (filter === 'unread') return !n.isRead;
+    if (filter === 'read') return n.isRead;
     return true;
   });
 
@@ -54,7 +56,7 @@ const Notifications = () => {
             <FiBell className="h-6 w-6 text-blue-600" />
             <div>
               <p className="text-sm text-gray-600">Total</p>
-              <p className="text-2xl font-bold text-gray-900">{notifications?.length || 0}</p>
+              <p className="text-2xl font-bold text-gray-900">{notificationsList.length}</p>
             </div>
           </div>
         </Card>
@@ -64,7 +66,7 @@ const Notifications = () => {
             <div>
               <p className="text-sm text-gray-600">Unread</p>
               <p className="text-2xl font-bold text-gray-900">
-                {notifications?.filter(n => !n.read).length || 0}
+                {notificationsList.filter(n => !n.isRead).length}
               </p>
             </div>
           </div>
@@ -75,7 +77,7 @@ const Notifications = () => {
             <div>
               <p className="text-sm text-gray-600">Read</p>
               <p className="text-2xl font-bold text-gray-900">
-                {notifications?.filter(n => n.read).length || 0}
+                {notificationsList.filter(n => n.isRead).length}
               </p>
             </div>
           </div>
@@ -108,7 +110,7 @@ const Notifications = () => {
       ) : (
         <div className="space-y-4">
           {filteredNotifications?.map((notification, index) => (
-            <Card key={notification._id} className={`hover:shadow-lg transition-all animate-slide-up ${!notification.read ? 'border-l-4 border-blue-600' : ''}`} style={{ animationDelay: `${index * 50}ms` }}>
+            <Card key={notification._id} className={`hover:shadow-lg transition-all animate-slide-up ${!notification.isRead ? 'border-l-4 border-blue-600' : ''}`} style={{ animationDelay: `${index * 50}ms` }}>
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-start justify-between mb-2">
@@ -121,14 +123,14 @@ const Notifications = () => {
                         <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
                       </div>
                     </div>
-                    {!notification.read && (
+                    {!notification.isRead && (
                       <Badge variant="primary">New</Badge>
                     )}
                   </div>
                   <p className="text-xs text-gray-500 mt-3">{new Date(notification.createdAt).toLocaleString()}</p>
                 </div>
                 <div className="flex space-x-2">
-                  {!notification.read && (
+                  {!notification.isRead && (
                     <Button
                       variant="secondary"
                       size="sm"

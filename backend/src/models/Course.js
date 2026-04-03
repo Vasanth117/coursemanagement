@@ -86,4 +86,16 @@ const CourseSchema = new mongoose.Schema({
 // Prevent user from submitting duplicate course codes
 CourseSchema.index({ code: 1 }, { unique: true });
 
+// Virtual for assignments
+CourseSchema.virtual('assignments', {
+  ref: 'Assignment',
+  localField: '_id',
+  foreignField: 'course',
+  justOne: false
+});
+
+// Enable virtuals
+CourseSchema.set('toJSON', { virtuals: true });
+CourseSchema.set('toObject', { virtuals: true });
+
 module.exports = mongoose.model('Course', CourseSchema);

@@ -247,7 +247,7 @@ exports.deleteCourse = asyncHandler(async (req, res, next) => {
   await Enrollment.deleteMany({ course: req.params.id });
   await Grade.deleteMany({ course: req.params.id });
 
-  await course.remove();
+  await course.deleteOne();
 
   res.status(200).json({
     success: true,

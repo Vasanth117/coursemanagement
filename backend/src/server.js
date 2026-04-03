@@ -1,10 +1,22 @@
-const dotenv = require('dotenv');
+// Load environment variables
+require('dotenv').config();
+
+const express = require('express');
 const mongoose = require('mongoose');
 const app = require('./app');
 const { Logger } = require('./utils');
+const WebSocketService = require('./services/WebSocketService');
+const http = require('http');
 
-// Load environment variables
-dotenv.config();
+
+// Create HTTP server
+const server = http.createServer(app);
+
+// Initialize WebSocket service
+const wsService = new WebSocketService(server);
+
+// Make WebSocket service available globally
+app.set('wsService', wsService);
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (err) => {
@@ -26,16 +38,13 @@ const connectDB = async () => {
 // Start server
 const startServer = async () => {
   try {
-    // Connect to database
     await connectDB();
-
-    // Start server
     const PORT = process.env.PORT || 5000;
-    const server = app.listen(PORT, () => {
-      Logger.info(`Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
+    
+    server.listen(PORT, () => {
+      Logger.info(`Server running on port ${PORT} with WebSocket support`);
     });
 
-    // Handle unhandled promise rejections
     process.on('unhandledRejection', (err) => {
       Logger.error('Unhandled Promise Rejection:', err);
       server.close(() => {
@@ -43,7 +52,6 @@ const startServer = async () => {
       });
     });
 
-    // Graceful shutdown
     process.on('SIGTERM', () => {
       Logger.info('SIGTERM received, shutting down gracefully');
       server.close(() => {
@@ -58,5 +66,4 @@ const startServer = async () => {
   }
 };
 
-// Start the application
 startServer();

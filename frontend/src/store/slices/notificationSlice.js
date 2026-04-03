@@ -50,7 +50,7 @@ const notificationSlice = createSlice({
   reducers: {
     addNotification: (state, action) => {
       state.notifications.unshift(action.payload);
-      if (!action.payload.read) {
+      if (!action.payload.isRead) {
         state.unreadCount += 1;
       }
     },
@@ -71,8 +71,9 @@ const notificationSlice = createSlice({
       })
       .addCase(fetchNotifications.fulfilled, (state, action) => {
         state.loading = false;
-        state.notifications = action.payload.notifications || action.payload;
-        state.unreadCount = state.notifications.filter(n => !n.read).length;
+        // The backend returns the array in action.payload.data
+        state.notifications = action.payload.data || (Array.isArray(action.payload) ? action.payload : []);
+        state.unreadCount = state.notifications.filter(n => !n.isRead).length;
       })
       .addCase(fetchNotifications.rejected, (state, action) => {
         state.loading = false;
@@ -80,24 +81,24 @@ const notificationSlice = createSlice({
       })
       // Mark as read
       .addCase(markAsRead.fulfilled, (state, action) => {
-        const notification = state.notifications.find(n => n._id === action.payload);
-        if (notification && !notification.read) {
-          notification.read = true;
+        const notification = state.notifications.find(n => (n._id || n.id) === action.payload);
+        if (notification && !notification.isRead) {
+          notification.isRead = true;
           state.unreadCount = Math.max(0, state.unreadCount - 1);
         }
       })
       // Mark all as read
       .addCase(markAllAsRead.fulfilled, (state) => {
-        state.notifications.forEach(n => n.read = true);
+        state.notifications.forEach(n => n.isRead = true);
         state.unreadCount = 0;
       })
       // Delete notification
       .addCase(deleteNotification.fulfilled, (state, action) => {
-        const notification = state.notifications.find(n => n._id === action.payload);
-        if (notification && !notification.read) {
+        const notification = state.notifications.find(n => (n._id || n.id) === action.payload);
+        if (notification && !notification.isRead) {
           state.unreadCount = Math.max(0, state.unreadCount - 1);
         }
-        state.notifications = state.notifications.filter(n => n._id !== action.payload);
+        state.notifications = state.notifications.filter(n => (n._id || n.id) !== action.payload);
       });
   },
 });

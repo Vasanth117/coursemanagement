@@ -161,9 +161,9 @@ exports.createResource = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Please provide course and title', 400));
   }
 
-  // Check if file is uploaded
-  if (!req.file) {
-    return next(new ErrorResponse('Please upload a file', 400));
+  // Check if files are uploaded
+  if (!req.files || req.files.length === 0) {
+    return next(new ErrorResponse('Please upload at least one file', 400));
   }
 
   // Validate course
@@ -178,20 +178,32 @@ exports.createResource = asyncHandler(async (req, res, next) => {
   }
 
   // Validate file type
-  const validTypes = ['document', 'video', 'audio', 'image', 'presentation', 'spreadsheet', 'code', 'archive', 'other'];
+  const validTypes = ['document', 'video', 'audio', 'image', 'presentation', 'spreadsheet', 'code', 'archive', 'lecture', 'assignment', 'reference', 'other'];
   if (!validTypes.includes(type)) {
     return next(new ErrorResponse(`Invalid resource type. Valid types: ${validTypes.join(', ')}`, 400));
   }
 
-  // Upload to Cloudinary
-  let uploadResult;
-  try {
-    uploadResult = await uploadToCloudinary(req.file.path, {
-      folder: `resources/course_${course}`,
-      resource_type: 'auto'
-    });
-  } catch (error) {
-    return next(new ErrorResponse('Failed to upload file to Cloudinary', 500));
+  // Upload all files to Cloudinary
+  const uploadedFiles = [];
+  for (const file of req.files) {
+    try {
+      const uploadResult = await uploadToCloudinary(file.path, {
+        folder: `resources/course_${course}`,
+        resource_type: 'auto'
+      });
+      
+      uploadedFiles.push({
+        name: file.originalname,
+        url: uploadResult.secure_url,
+        size: file.size,
+        mimeType: file.mimetype,
+        publicId: uploadResult.public_id,
+        uploadedAt: new Date()
+      });
+    } catch (error) {
+      console.error('Cloudinary upload error:', error);
+      return next(new ErrorResponse(`Failed to upload file: ${file.originalname}`, 500));
+    }
   }
 
   // Create resource record
@@ -200,11 +212,13 @@ exports.createResource = asyncHandler(async (req, res, next) => {
     title,
     description,
     type,
-    fileUrl: uploadResult.secure_url,
-    fileName: req.file.originalname,
-    fileSize: req.file.size,
-    mimeType: req.file.mimetype,
-    publicId: uploadResult.public_id,
+    files: uploadedFiles,
+    // Backward compatibility
+    fileUrl: uploadedFiles[0].url,
+    fileName: uploadedFiles[0].name,
+    fileSize: uploadedFiles[0].size,
+    mimeType: uploadedFiles[0].mimeType,
+    publicId: uploadedFiles[0].publicId,
     uploadedBy: req.user.id
   });
 
@@ -304,22 +318,35 @@ exports.deleteResource = asyncHandler(async (req, res, next) => {
   // Check authorization
   const isAdmin = req.user.role === 'admin';
   const isUploader = resource.uploadedBy._id.toString() === req.user.id;
-  const isFaculty = req.user.role === 'faculty' && resource.course.faculty.toString() === req.user.id;
+  const isFaculty = req.user.role === 'faculty' && resource.course && resource.course.faculty.toString() === req.user.id;
 
   if (!isAdmin && !isUploader && !isFaculty) {
     return next(new ErrorResponse('Not authorized to delete this resource', 403));
   }
 
-  // Delete file from Cloudinary
+  // Delete all files in the array from Cloudinary
+  if (resource.files && resource.files.length > 0) {
+    for (const file of resource.files) {
+      if (file.publicId) {
+        try {
+          await deleteFromCloudinary(file.publicId);
+        } catch (error) {
+          console.error(`Failed to delete file from Cloudinary: ${file.publicId}`, error);
+        }
+      }
+    }
+  }
+
+  // Delete legacy single file from Cloudinary
   if (resource.publicId) {
     try {
       await deleteFromCloudinary(resource.publicId);
     } catch (error) {
-      console.error(`Failed to delete file from Cloudinary: ${resource.publicId}`, error);
+      console.error(`Failed to delete legacy file from Cloudinary: ${resource.publicId}`, error);
     }
   }
 
-  await resource.remove();
+  await resource.deleteOne();
 
   res.status(200).json({
     success: true,
@@ -331,7 +358,7 @@ exports.deleteResource = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/resources/course/:courseId
 // @access  Private
 exports.getCourseResources = asyncHandler(async (req, res, next) => {
-  const { courseId } = req.params;
+  const courseId = req.params.courseId || req.params.id;
 
   // Validate course
   const course = await Course.findById(courseId);

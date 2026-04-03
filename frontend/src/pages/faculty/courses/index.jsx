@@ -87,7 +87,7 @@ const CoursesIndex = () => {
               <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
                 <div className="flex items-center space-x-2">
                   <FiUsers className="h-4 w-4" />
-                  <span>{course.enrolledStudents || 0} students</span>
+                  <span>{course.enrolledStudents?.length || 0} students</span>
                 </div>
                 <span className="font-medium">{course.credits} Credits</span>
               </div>

@@ -23,7 +23,9 @@ import {
   GradesIndex,
   Schedule,
   Profile,
-  Notifications
+  Notifications,
+  Announcements as StudentAnnouncements,
+  CourseLearning
 } from './pages/student';
 import {
   Dashboard as FacultyDashboard,
@@ -44,7 +46,7 @@ import {
   Resources
 } from './pages/faculty';
 import AdminDashboard from './pages/admin/Dashboard';
-import { UsersManagement, CreateUser, EditUser, UserDetails, CoursesManagement, Analytics, Settings, Reports } from './pages/admin';
+import { UsersManagement, CreateUser, EditUser, UserDetails, CoursesManagement, Analytics, Settings, Reports, SystemLogs, Security } from './pages/admin';
 import './index.css';
 import './App.css';
 
@@ -103,6 +105,7 @@ function App() {
             <Route path="/student/courses" element={<StudentCoursesIndex />} />
             <Route path="/student/courses/my-courses" element={<MyCourses />} />
             <Route path="/student/courses/:id" element={<StudentCourseDetails />} />
+            <Route path="/student/courses/:id/learning" element={<CourseLearning />} />
             <Route path="/student/courses/:id/enroll" element={<EnrollCourse />} />
             <Route path="/student/assignments" element={<StudentAssignmentsIndex />} />
             <Route path="/student/assignments/:id" element={<StudentAssignmentDetails />} />
@@ -111,6 +114,7 @@ function App() {
             <Route path="/student/schedule" element={<Schedule />} />
             <Route path="/student/profile" element={<Profile />} />
             <Route path="/student/notifications" element={<Notifications />} />
+            <Route path="/student/announcements" element={<StudentAnnouncements />} />
           </Route>
 
           {/* Faculty Routes */}
@@ -144,6 +148,8 @@ function App() {
             <Route path="/admin/analytics" element={<Analytics />} />
             <Route path="/admin/settings" element={<Settings />} />
             <Route path="/admin/reports" element={<Reports />} />
+            <Route path="/admin/logs" element={<SystemLogs />} />
+            <Route path="/admin/security" element={<Security />} />
           </Route>
 
           {/* Default Routes */}

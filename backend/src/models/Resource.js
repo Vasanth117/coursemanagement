@@ -18,39 +18,27 @@ const ResourceSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['document', 'video', 'audio', 'image', 'link', 'presentation', 'spreadsheet'],
-    required: [true, 'Please add resource type']
+    enum: ['document', 'video', 'audio', 'image', 'link', 'presentation', 'spreadsheet', 'lecture', 'assignment', 'reference', 'other'],
+    default: 'document'
   },
-  category: {
-    type: String,
-    enum: ['lecture', 'reading', 'assignment', 'reference', 'supplementary', 'exam'],
-    default: 'lecture'
-  },
-  file: {
-    filename: String,
-    originalName: String,
-    path: String,
+  files: [{
+    name: String,
+    url: String,
     size: Number,
-    mimetype: String
-  },
-  url: {
-    type: String,
-    validate: {
-      validator: function(v) {
-        return this.type === 'link' ? !!v : true;
-      },
-      message: 'URL is required for link type resources'
+    mimeType: String,
+    publicId: String,
+    uploadedAt: {
+      type: Date,
+      default: Date.now
     }
-  },
-  isPublic: {
-    type: Boolean,
-    default: false
-  },
-  accessLevel: {
-    type: String,
-    enum: ['public', 'enrolled', 'faculty'],
-    default: 'enrolled'
-  },
+  }],
+  // For backwards compatibility or single file if still used
+  fileUrl: String,
+  fileName: String,
+  fileSize: Number,
+  mimeType: String,
+  publicId: String,
+  
   downloadCount: {
     type: Number,
     default: 0
@@ -77,14 +65,10 @@ const ResourceSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
+}, {
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
 });
-
-// Index for efficient queries
-ResourceSchema.index({ course: 1, category: 1 });
-ResourceSchema.index({ type: 1 });
-ResourceSchema.index({ accessLevel: 1 });
-ResourceSchema.index({ tags: 1 });
-ResourceSchema.index({ createdAt: -1 });
 
 // Update the updatedAt field before saving
 ResourceSchema.pre('save', function(next) {
@@ -93,15 +77,16 @@ ResourceSchema.pre('save', function(next) {
 });
 
 // Virtual for file size in readable format
-ResourceSchema.virtual('fileSizeFormatted').get(function() {
-  if (!this.file || !this.file.size) return null;
-  
-  const bytes = this.file.size;
+ResourceSchema.virtual('totalSizeFormatted').get(function() {
+  const totalBytes = this.files && this.files.length > 0 
+    ? this.files.reduce((sum, f) => sum + (f.size || 0), 0)
+    : (this.fileSize || 0);
+
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-  if (bytes === 0) return '0 Bytes';
+  if (totalBytes === 0) return '0 Bytes';
   
-  const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
-  return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
+  const i = parseInt(Math.floor(Math.log(totalBytes) / Math.log(1024)));
+  return Math.round(totalBytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
 });
 
 module.exports = mongoose.model('Resource', ResourceSchema);

@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { studentAPI } from '../../../api/student';
-import { FiBook, FiUsers, FiFileText, FiEye, FiCalendar } from 'react-icons/fi';
+import { FiBook, FiUsers, FiFileText, FiEye, FiCalendar, FiPlay } from 'react-icons/fi';
 import { LoadingSpinner, Card, Badge, EmptyState, Button, ProgressBar } from '../../../components/common';
 
 const MyCourses = () => {
@@ -81,41 +81,41 @@ const MyCourses = () => {
         />
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {courses.map((course, index) => (
-            <Card key={course._id} className="hover:shadow-xl transition-all duration-300 animate-slide-up" style={{ animationDelay: `${index * 100}ms` }}>
+          {courses.map((enrollment, index) => (
+            <Card key={enrollment._id} className="hover:shadow-xl transition-all duration-300 animate-slide-up" style={{ animationDelay: `${index * 100}ms` }}>
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900">{course.title}</h3>
-                  <p className="text-sm text-gray-600 mt-1">{course.courseCode} • {course.department}</p>
+                  <h3 className="text-xl font-bold text-gray-900">{enrollment.course?.title}</h3>
+                  <p className="text-sm text-gray-600 mt-1">{enrollment.course?.code} • {enrollment.course?.department}</p>
                 </div>
-                <Badge variant={course.status === 'active' ? 'success' : 'default'}>
-                  {course.status}
+                <Badge variant={enrollment.status === 'enrolled' ? 'success' : 'default'}>
+                  {enrollment.status}
                 </Badge>
               </div>
 
-              <p className="text-sm text-gray-700 mb-4 line-clamp-2">{course.description}</p>
+              <p className="text-sm text-gray-700 mb-4 line-clamp-2">{enrollment.course?.description}</p>
 
               {/* Progress */}
               <div className="mb-4">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm font-medium text-gray-700">Course Progress</span>
-                  <span className="text-sm font-bold text-gray-900">{course.progress || 0}%</span>
+                  <span className="text-sm font-bold text-gray-900">{enrollment.progress || 0}%</span>
                 </div>
-                <ProgressBar value={course.progress || 0} color="blue" />
+                <ProgressBar value={enrollment.progress || 0} color="blue" />
               </div>
 
               {/* Stats */}
               <div className="grid grid-cols-3 gap-4 mb-4 p-4 bg-gray-50 rounded-xl">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-blue-600">{course.credits}</p>
+                  <p className="text-2xl font-bold text-blue-600">{enrollment.course?.credits}</p>
                   <p className="text-xs text-gray-600">Credits</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-green-600">{course.assignments || 0}</p>
+                  <p className="text-2xl font-bold text-green-600">{enrollment.assignmentsCompleted || 0}</p>
                   <p className="text-xs text-gray-600">Assignments</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-purple-600">{course.grade || 'N/A'}</p>
+                  <p className="text-2xl font-bold text-purple-600">{enrollment.grade || 'N/A'}</p>
                   <p className="text-xs text-gray-600">Grade</p>
                 </div>
               </div>
@@ -123,11 +123,11 @@ const MyCourses = () => {
               {/* Schedule */}
               <div className="flex items-center space-x-2 text-sm text-gray-600 mb-4">
                 <FiCalendar className="h-4 w-4" />
-                <span>{course.schedule?.days?.join(', ')} • {course.schedule?.time}</span>
+                <span>{enrollment.course?.schedule?.days?.join(', ')} • {enrollment.course?.schedule?.time}</span>
               </div>
 
-              <Link to={`/student/courses/${course._id}`}>
-                <Button variant="primary" icon={FiEye} className="w-full">View Course</Button>
+              <Link to={`/student/courses/${enrollment.course?._id}/learning`}>
+                <Button variant="primary" icon={FiPlay} className="w-full">Start Learning</Button>
               </Link>
             </Card>
           ))}

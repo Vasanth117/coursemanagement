@@ -15,7 +15,8 @@ const CreateAssignment = () => {
     description: '',
     course: '',
     dueDate: '',
-    totalMarks: 100,
+    maxPoints: 100,
+    type: 'homework',
     attachments: []
   });
 
@@ -39,7 +40,22 @@ const CreateAssignment = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    createMutation.mutate(formData);
+    
+    const data = new FormData();
+    data.append('title', formData.title);
+    data.append('description', formData.description);
+    data.append('course', formData.course);
+    data.append('dueDate', formData.dueDate);
+    data.append('maxPoints', formData.maxPoints);
+    data.append('type', formData.type);
+    
+    if (formData.attachments.length > 0) {
+      // Backend expects upload.single('file') or upload.array('files')
+      // facultyRoutes.js has upload.single('file')
+      data.append('file', formData.attachments[0]);
+    }
+    
+    createMutation.mutate(data);
   };
 
   const handleFileChange = (e) => {
@@ -113,13 +129,29 @@ const CreateAssignment = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Total Marks *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Assignment Type *</label>
+                <select
+                  required
+                  value={formData.type}
+                  onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="homework">Homework</option>
+                  <option value="quiz">Quiz</option>
+                  <option value="exam">Exam</option>
+                  <option value="project">Project</option>
+                  <option value="lab">Lab</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Max Points *</label>
                 <input
                   type="number"
                   required
                   min="1"
-                  value={formData.totalMarks}
-                  onChange={(e) => setFormData({ ...formData, totalMarks: e.target.value })}
+                  value={formData.maxPoints}
+                  onChange={(e) => setFormData({ ...formData, maxPoints: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>

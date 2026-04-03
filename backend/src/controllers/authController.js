@@ -1,5 +1,5 @@
 const { authService } = require('../services');
-const { User } = require('../models');
+const { User, AuditLog } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/ErrorResponse');
 const { OAuth2Client } = require('google-auth-library');
@@ -22,6 +22,16 @@ exports.register = asyncHandler(async (req, res, next) => {
     options.secure = true;
   }
 
+  // Log registration
+  await AuditLog.create({
+    user: result.user.id,
+    action: 'login', // Initial login after registration
+    module: 'auth',
+    details: `User registered and logged in: ${result.user.email}`,
+    ipAddress: req.ip,
+    userAgent: req.get('User-Agent')
+  });
+
   res.status(201)
     .cookie('token', result.token, options)
     .json(result);
@@ -38,6 +48,16 @@ exports.login = asyncHandler(async (req, res, next) => {
   }
 
   const result = await authService.login(email, password);
+
+  // Log login
+  await AuditLog.create({
+    user: result.user.id,
+    action: 'login',
+    module: 'auth',
+    details: `User logged in: ${result.user.email}`,
+    ipAddress: req.ip,
+    userAgent: req.get('User-Agent')
+  }).catch(err => console.error('AuditLog failed:', err));
 
   // Set JWT cookie
   const options = {
@@ -238,6 +258,18 @@ exports.logout = asyncHandler(async (req, res, next) => {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true
   });
+
+  // Log logout
+  if (req.user) {
+    await AuditLog.create({
+      user: req.user.id,
+      action: 'logout',
+      module: 'auth',
+      details: `User logged out: ${req.user.role}`,
+      ipAddress: req.ip,
+      userAgent: req.get('User-Agent')
+    });
+  }
 
   res.status(200).json({
     success: true,

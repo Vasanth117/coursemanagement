@@ -270,7 +270,7 @@ exports.deleteGrade = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Not authorized to delete grades', 403));
   }
 
-  await grade.remove();
+  await grade.deleteOne();
 
   res.status(200).json({
     success: true,

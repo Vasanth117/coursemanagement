@@ -14,7 +14,7 @@ const storage = multer.diskStorage({
       uploadPath += 'assignments/';
     } else if (file.fieldname === 'submission') {
       uploadPath += 'submissions/';
-    } else if (file.fieldname === 'resource') {
+    } else if (file.fieldname === 'resource' || file.fieldname === 'resources' || file.fieldname === 'files') {
       uploadPath += 'resources/';
     } else {
       uploadPath += 'misc/';
@@ -35,7 +35,9 @@ const fileFilter = (req, file, cb) => {
     profileImage: /jpeg|jpg|png|gif/,
     assignment: /pdf|doc|docx|txt|zip|rar/,
     submission: /pdf|doc|docx|txt|zip|rar|jpg|jpeg|png/,
-    resource: /pdf|doc|docx|ppt|pptx|txt|zip|rar|jpg|jpeg|png|mp4|avi|mov/
+    resource: /pdf|doc|docx|ppt|pptx|txt|zip|rar|jpg|jpeg|png|mp4|avi|mov/,
+    resources: /pdf|doc|docx|ppt|pptx|txt|zip|rar|jpg|jpeg|png|mp4|avi|mov/,
+    files: /pdf|doc|docx|ppt|pptx|txt|zip|rar|jpg|jpeg|png|mp4|avi|mov/
   };
 
   const fileType = allowedTypes[file.fieldname] || /pdf|doc|docx|txt|jpg|jpeg|png/;
@@ -45,7 +47,7 @@ const fileFilter = (req, file, cb) => {
   if (mimetype && extname) {
     return cb(null, true);
   } else {
-    cb(new ErrorResponse('Invalid file type', 400));
+    cb(new ErrorResponse(`Invalid file type for field ${file.fieldname}`, 400));
   }
 };
 
@@ -54,28 +56,31 @@ const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 10 * 1024 * 1024 // 10MB limit
+    fileSize: 50 * 1024 * 1024 // Increased to 50MB to match frontend expectation
   }
 });
+
+// Export the upload instance
+exports.upload = upload;
 
 // Middleware for different upload types
 exports.uploadProfileImage = upload.single('profileImage');
 exports.uploadAssignment = upload.single('assignment');
 exports.uploadSubmission = upload.single('submission');
-exports.uploadResource = upload.single('resource');
-exports.uploadMultipleResources = upload.array('resources', 5);
+exports.uploadResource = upload.array('files', 10); // Match frontend field name 'files' and support multiple
+exports.uploadMultipleResources = upload.array('files', 10);
 
 // Error handling middleware for multer
 exports.handleUploadError = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     if (err.code === 'LIMIT_FILE_SIZE') {
-      return next(new ErrorResponse('File too large. Maximum size is 10MB', 400));
+      return next(new ErrorResponse('File too large. Maximum size is 50MB', 400));
     }
     if (err.code === 'LIMIT_FILE_COUNT') {
-      return next(new ErrorResponse('Too many files. Maximum is 5 files', 400));
+      return next(new ErrorResponse('Too many files. Maximum is 10 files', 400));
     }
     if (err.code === 'LIMIT_UNEXPECTED_FILE') {
-      return next(new ErrorResponse('Unexpected field name', 400));
+      return next(new ErrorResponse(`Unexpected field: ${err.field}. Please use 'files' for resources.`, 400));
     }
   }
   next(err);

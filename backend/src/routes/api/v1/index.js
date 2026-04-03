@@ -11,6 +11,7 @@ const gradeRoutes = require('./gradeRoutes');
 const announcementRoutes = require('./announcementRoutes');
 const resourceRoutes = require('./resourceRoutes');
 const attendanceRoutes = require('./attendanceRoutes');
+const notificationRoutes = require('./notificationRoutes');
 
 const router = express.Router();
 
@@ -25,7 +26,8 @@ router.get('/', (req, res) => {
       courses: '/api/v1/courses',
       admin: '/api/v1/admin',
       faculty: '/api/v1/faculty',
-      student: '/api/v1/student'
+      student: '/api/v1/student',
+      notifications: '/api/v1/notifications'
     }
   });
 });
@@ -43,5 +45,6 @@ router.use('/grades', gradeRoutes);
 router.use('/announcements', announcementRoutes);
 router.use('/resources', resourceRoutes);
 router.use('/attendance', attendanceRoutes);
+router.use('/notifications', notificationRoutes);
 
 module.exports = router;

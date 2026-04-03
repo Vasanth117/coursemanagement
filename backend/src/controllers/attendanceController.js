@@ -309,7 +309,7 @@ exports.deleteAttendance = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Not authorized to delete this attendance record', 403));
   }
 
-  await attendance.remove();
+  await attendance.deleteOne();
 
   res.status(200).json({
     success: true,

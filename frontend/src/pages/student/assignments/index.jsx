@@ -136,12 +136,12 @@ const AssignmentsIndex = () => {
                     </div>
                     <div className="flex items-center space-x-2">
                       <FiFileText className="h-4 w-4" />
-                      <span>{assignment.totalMarks} marks</span>
+                      <span>{assignment.maxPoints} marks</span>
                     </div>
                     {assignment.grade !== undefined && (
                       <div className="flex items-center space-x-2">
                         <FiCheckCircle className="h-4 w-4 text-green-600" />
-                        <span className="font-medium text-green-600">Grade: {assignment.grade}/{assignment.totalMarks}</span>
+                        <span className="font-medium text-green-600">Grade: {assignment.grade}/{assignment.maxPoints}</span>
                       </div>
                     )}
                   </div>

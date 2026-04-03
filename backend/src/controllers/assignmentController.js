@@ -1,4 +1,4 @@
-const { Assignment, Course, Grade, User, Resource } = require('../models');
+const { Assignment, Course, Grade, User, Resource, Notification } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/ErrorResponse');
 const mongoose = require('mongoose');
@@ -284,9 +284,11 @@ exports.createAssignment = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Not authorized to create assignment for this course', 403));
   }
 
-  // Validate due date
-  if (new Date(req.body.dueDate) <= new Date()) {
-    return next(new ErrorResponse('Due date must be in the future', 400));
+  // Validate due date (must be today or future)
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  if (new Date(req.body.dueDate) < today) {
+    return next(new ErrorResponse('Due date cannot be in the past', 400));
   }
 
   // Validate max points
@@ -321,11 +323,39 @@ exports.createAssignment = asyncHandler(async (req, res, next) => {
   // Create assignment
   const assignmentData = {
     ...req.body,
+    isPublished: true,
     createdBy: req.user.id,
     ...(attachments.length > 0 && { attachments })
   };
 
   const assignment = await Assignment.create(assignmentData);
+
+  // Send notifications and broadcast to enrolled students
+  try {
+    const studentIds = course.enrolledStudents;
+    
+    if (studentIds && studentIds.length > 0) {
+      // 1. Create notifications in DB
+      const notifications = studentIds.map(studentId => ({
+        recipient: studentId,
+        sender: req.user.id,
+        title: 'New Assignment Posted',
+        message: `A new assignment "${assignment.title}" has been posted in ${course.code}.`,
+        type: 'assignment',
+        link: `/student/assignments/${assignment._id}`
+      }));
+      
+      await Notification.insertMany(notifications);
+      
+      // 2. Broadcast via WebSocket
+      const wsService = req.app.get('wsService');
+      if (wsService) {
+        wsService.broadcastNewAssignment(assignment, studentIds);
+      }
+    }
+  } catch (err) {
+    console.error('Error sending assignment notifications:', err);
+  }
 
   // Populate details for response
   await assignment.populate('course', 'title code');
@@ -383,11 +413,10 @@ exports.updateAssignment = asyncHandler(async (req, res, next) => {
         });
 
         attachments.push({
-          fileName: file.originalname,
-          fileUrl: result.secure_url,
-          fileSize: file.size,
-          mimeType: file.mimetype,
-          publicId: result.public_id,
+          filename: file.originalname,
+          originalName: file.originalname,
+          path: result.secure_url,
+          size: file.size,
           uploadedAt: new Date()
         });
       } catch (error) {
@@ -470,7 +499,7 @@ exports.deleteAssignment = asyncHandler(async (req, res, next) => {
     }
   }
 
-  await assignment.remove();
+  await assignment.deleteOne();
 
   res.status(200).json({
     success: true,

@@ -1,7 +1,8 @@
-const { Course, Assignment, Enrollment, Grade, User, Resource, Announcement } = require('../models');
+const { Course, Assignment, Enrollment, Grade, User, Resource, Announcement, Notification, Submission, Attendance } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/ErrorResponse');
 const { uploadToCloudinary } = require('../config/cloudinary');
+const mongoose = require('mongoose');
 
 // @desc    Get faculty dashboard
 // @route   GET /api/v1/faculty/dashboard
@@ -146,7 +147,7 @@ exports.getFacultyCourse = asyncHandler(async (req, res, next) => {
     })
     .populate({
       path: 'assignments',
-      select: 'title dueDate type maxPoints submissionCount'
+      select: 'title dueDate type maxPoints'
     });
 
   if (!course) {
@@ -297,7 +298,7 @@ exports.deleteCourse = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Cannot delete course with assignments. Delete assignments first.', 400));
   }
 
-  await course.remove();
+  await course.deleteOne();
 
   res.status(200).json({
     success: true,
@@ -463,9 +464,11 @@ exports.createAssignment = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Course not found or not authorized', 404));
   }
 
-  // Check if due date is in the future
-  if (new Date(req.body.dueDate) <= new Date()) {
-    return next(new ErrorResponse('Due date must be in the future', 400));
+  // Check if due date is valid (must be today or in the future)
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Start of today
+  if (new Date(req.body.dueDate) < today) {
+    return next(new ErrorResponse('Due date cannot be in the past', 400));
   }
 
   // Handle file upload if present
@@ -476,20 +479,49 @@ exports.createAssignment = asyncHandler(async (req, res, next) => {
         resource_type: 'auto'
       });
       req.body.attachments = [{
-        fileName: req.file.originalname,
-        fileUrl: result.secure_url,
-        fileSize: req.file.size,
-        publicId: result.public_id
+        filename: req.file.originalname,
+        originalName: req.file.originalname,
+        path: result.secure_url,
+        size: req.file.size
       }];
     } catch (error) {
       return next(new ErrorResponse('Failed to upload file', 500));
     }
   }
 
-  // Set creator
+  // Set creator and publish by default
   req.body.createdBy = req.user.id;
+  req.body.isPublished = true;
 
   const assignment = await Assignment.create(req.body);
+
+  // Send notifications and broadcast to enrolled students
+  try {
+    const studentIds = course.enrolledStudents;
+    
+    if (studentIds && studentIds.length > 0) {
+      // 1. Create notifications in DB
+      const notifications = studentIds.map(studentId => ({
+        recipient: studentId,
+        sender: req.user.id,
+        title: 'New Assignment Posted',
+        message: `A new assignment "${assignment.title}" has been posted in ${course.code}.`,
+        type: 'assignment',
+        link: `/student/assignments/${assignment._id}`
+      }));
+      
+      await Notification.insertMany(notifications);
+      
+      // 2. Broadcast via WebSocket
+      const wsService = req.app.get('wsService');
+      if (wsService) {
+        wsService.broadcastNewAssignment(assignment, studentIds);
+      }
+    }
+  } catch (err) {
+    console.error('Error sending assignment notifications:', err);
+    // Continue anyway, assignment is already created
+  }
 
   res.status(201).json({
     success: true,
@@ -634,50 +666,101 @@ exports.createAnnouncement = asyncHandler(async (req, res, next) => {
 });
 
 // @desc    Upload course resource
-// @route   POST /api/v1/faculty/resources
+// @route   POST /api/v1/faculty/courses/:id/resources
 // @access  Private/Faculty
 exports.uploadResource = asyncHandler(async (req, res, next) => {
-  const { course, title, description, type } = req.body;
+  console.log('--- Upload Resource Debug ---');
+  console.log('Request Params:', req.params);
+  console.log('Request Body:', req.body);
+  console.log('Files received:', req.files?.length || 0);
+  
+  const { title, description, type } = req.body;
+  const courseId = req.body.course || req.params.id;
+  console.log('Detected Course ID:', courseId);
+
+  if (!courseId || !title) {
+    console.error('Validation failed: Course ID or Title missing');
+    return next(new ErrorResponse('Please provide course ID and title', 400));
+  }
 
   // Check if course exists and faculty owns it
-  const courseExists = await Course.findOne({
-    _id: course,
+  const course = await Course.findOne({
+    _id: courseId,
     faculty: req.user.id
   });
 
-  if (!courseExists) {
+  if (!course) {
+    console.error(`Authorization failed: Course ${courseId} not found for faculty ${req.user.id}`);
     return next(new ErrorResponse('Course not found or not authorized', 404));
   }
 
-  // Check if file is uploaded
-  if (!req.file) {
-    return next(new ErrorResponse('Please upload a file', 400));
+  // Check if files are uploaded
+  if (!req.files || req.files.length === 0) {
+    console.error('Validation failed: No files uploaded');
+    return next(new ErrorResponse('Please upload at least one file', 400));
   }
 
-  // Upload to Cloudinary
-  let uploadResult;
-  try {
-    uploadResult = await uploadToCloudinary(req.file.path, {
-      folder: `resources/course_${course}`,
-      resource_type: 'auto'
-    });
-  } catch (error) {
-    return next(new ErrorResponse('Failed to upload file', 500));
+  // Upload all files to Cloudinary
+  const uploadedFiles = [];
+  for (const file of req.files) {
+    try {
+      const uploadResult = await uploadToCloudinary(file.path, {
+        folder: `resources/course_${courseId}`,
+        resource_type: 'auto'
+      });
+      
+      uploadedFiles.push({
+        name: file.originalname,
+        url: uploadResult.secure_url,
+        size: file.size,
+        mimeType: file.mimetype,
+        publicId: uploadResult.public_id,
+        uploadedAt: new Date()
+      });
+    } catch (error) {
+      console.error('Cloudinary upload error:', error);
+      return next(new ErrorResponse(`Failed to upload file: ${file.originalname}`, 500));
+    }
+  }
+
+  if (uploadedFiles.length === 0) {
+    return next(new ErrorResponse('Failed to upload any files', 500));
   }
 
   // Create resource record
   const resource = await Resource.create({
-    course,
+    course: courseId,
     title,
     description,
     type: type || 'document',
-    fileUrl: uploadResult.secure_url,
-    fileName: req.file.originalname,
-    fileSize: req.file.size,
-    mimeType: req.file.mimetype,
-    publicId: uploadResult.public_id,
+    files: uploadedFiles,
+    // Add single file fields for backward compatibility
+    fileUrl: uploadedFiles[0].url,
+    fileName: uploadedFiles[0].name,
+    fileSize: uploadedFiles[0].size,
+    mimeType: uploadedFiles[0].mimeType,
+    publicId: uploadedFiles[0].publicId,
     uploadedBy: req.user.id
   });
+
+  // Create notifications for enrolled students
+  try {
+    const students = course.enrolledStudents || [];
+    if (students.length > 0) {
+      const notifications = students.map(studentId => ({
+        recipient: studentId,
+        sender: req.user.id,
+        title: 'New Course Resource',
+        message: `A new resource "${title}" has been uploaded to ${course.title}`,
+        type: 'info',
+        link: `/student/courses/${courseId}/resources`
+      }));
+      await Notification.insertMany(notifications);
+    }
+  } catch (error) {
+    console.error('Failed to create notifications for resource upload:', error);
+    // Don't fail the request if notifications fail
+  }
 
   res.status(201).json({
     success: true,
@@ -874,6 +957,117 @@ exports.getStudents = asyncHandler(async (req, res, next) => {
     success: true,
     count: allStudents.length,
     data: allStudents
+  });
+});
+
+// @desc    Get single student details for faculty
+// @route   GET /api/v1/faculty/students/:id
+// @access  Private/Faculty
+exports.getStudentById = asyncHandler(async (req, res, next) => {
+  const facultyId = req.user.id;
+  const studentId = req.params.id;
+
+  // Check if student exists and is a student
+  const student = await User.findById(studentId).select('name email role studentId department phone bio profileImage');
+  
+  if (!student || student.role !== 'student') {
+    return next(new ErrorResponse('Student not found', 404));
+  }
+
+  // Get courses where THIS faculty teaches and THIS student is enrolled
+  const courses = await Course.find({ 
+    faculty: facultyId,
+    enrolledStudents: studentId 
+  }).select('title code department semester year');
+
+  if (courses.length === 0) {
+    return next(new ErrorResponse('Not authorized to view this student details', 403));
+  }
+
+  const courseIds = courses.map(c => c._id);
+
+  // Get student performance in these courses
+  const coursePerformance = await Promise.all(courses.map(async (course) => {
+    const grades = await Grade.find({
+      student: studentId,
+      course: course._id
+    }).populate('assignment', 'title maxPoints type weightage');
+
+    const totalScore = grades.reduce((sum, g) => sum + (g.score || 0), 0);
+    const totalMax = grades.reduce((sum, g) => sum + (g.maxScore || 0), 0);
+    const average = totalMax > 0 ? (totalScore / totalMax) * 100 : 0;
+
+    return {
+      courseId: course._id,
+      courseTitle: course.title,
+      courseCode: course.code,
+      average: Math.round(average * 100) / 100,
+      gradeCount: grades.length,
+      grades
+    };
+  }));
+
+  // Aggregate all assignments from these courses
+  const allGrades = await Grade.find({
+    student: studentId,
+    course: { $in: courseIds }
+  }).populate('assignment', 'title maxPoints type')
+    .populate('course', 'title code');
+
+  const assignmentsList = allGrades.map(g => ({
+    _id: g._id,
+    title: g.assignment?.title || 'Unknown Assignment',
+    course: g.course?.code || 'N/A',
+    submittedAt: g.submittedAt,
+    grade: g.score,
+    totalMarks: g.maxScore || g.assignment?.maxPoints || 100,
+    status: g.status
+  }));
+
+  // Get attendance records
+  const attendanceRecords = await Attendance.find({
+    student: studentId,
+    course: { $in: courseIds }
+  }).populate('course', 'title code').sort('-date');
+
+  const attendanceList = attendanceRecords.map(a => ({
+    course: a.course?.code || 'N/A',
+    date: a.date,
+    status: a.status
+  }));
+
+  // Calculate summary stats
+  const totalAssignments = await Assignment.countDocuments({ course: { $in: courseIds } });
+  const completedAssignments = assignmentsList.length;
+  const assignmentCompletion = totalAssignments > 0 ? Math.round((completedAssignments / totalAssignments) * 100) : 0;
+
+  const totalPossibleClasses = attendanceRecords.length;
+  const presentClasses = attendanceRecords.filter(a => ['present', 'late'].includes(a.status)).length;
+  const attendanceRate = totalPossibleClasses > 0 ? Math.round((presentClasses / totalPossibleClasses) * 100) : 0;
+
+  const averageGrade = coursePerformance.length > 0 
+    ? Math.round(coursePerformance.reduce((sum, cp) => sum + cp.average, 0) / coursePerformance.length)
+    : 0;
+
+  const performanceSummary = {
+    averageGrade: averageGrade + '%',
+    totalAssignments,
+    completedAssignments,
+    assignmentCompletion,
+    attendanceRate,
+    overallProgress: Math.round((assignmentCompletion + attendanceRate) / 2),
+    assignments: assignmentsList,
+    attendance: attendanceList
+  };
+
+  res.status(200).json({
+    success: true,
+    data: {
+      ...student.toObject(),
+      enrolledCourses: courses,
+      coursePerformance,
+      performance: performanceSummary
+    }
   });
 });
 

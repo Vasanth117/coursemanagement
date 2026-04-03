@@ -491,7 +491,7 @@ exports.deleteSubmission = asyncHandler(async (req, res, next) => {
     }
   }
 
-  await submission.remove();
+  await submission.deleteOne();
 
   res.status(200).json({
     success: true,

@@ -1,5 +1,5 @@
 const express = require('express');
-const { studentController } = require('../../../controllers');
+const { studentController, resourceController } = require('../../../controllers');
 const { auth, role, validation } = require('../../../middleware');
 
 const router = express.Router();
@@ -49,6 +49,24 @@ router.get('/courses/:id',
   auth.protect,
   role.studentOnly,
   studentController.getCourseDetails
+);
+
+// @route   GET /api/v1/student/courses/:id/resources
+// @desc    Get course resources
+// @access  Private/Student
+router.get('/courses/:id/resources',
+  auth.protect,
+  role.studentOnly,
+  resourceController.getCourseResources
+);
+
+// @route   GET /api/v1/student/courses/:id/assignments
+// @desc    Get course assignments
+// @access  Private/Student
+router.get('/courses/:id/assignments',
+  auth.protect,
+  role.studentOnly,
+  studentController.getAssignments
 );
 
 // @route   POST /api/v1/student/enroll

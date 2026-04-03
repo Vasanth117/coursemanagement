@@ -23,7 +23,8 @@ app.use(helmet());
 const allowedOrigins = [
   process.env.CLIENT_URL || 'http://localhost:3000',
   'http://localhost:3000',
-  'http://localhost:3001'
+  'http://localhost:8000',
+  'http://localhost:3002'
 ];
 
 app.use(cors({

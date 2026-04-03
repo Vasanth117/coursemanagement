@@ -15,6 +15,25 @@ router.get('/',
   enrollmentController.getEnrollments
 );
 
+// @route   GET /api/v1/faculty/:facultyId/enrollments
+// @desc    Get faculty course enrollments
+// @access  Private/Faculty or Admin
+router.get('/:facultyId/enrollments',
+  auth.protect,
+  validation.validateObjectId('facultyId'),
+  validation.handleValidationErrors,
+  enrollmentController.getFacultyEnrollments
+);
+
+// @route   GET /api/v1/enrollments/stats
+// @desc    Get enrollment statistics
+// @access  Private/Admin or Faculty
+router.get('/stats',
+  auth.protect,
+  role.adminOrFaculty,
+  enrollmentController.getEnrollmentStats
+);
+
 // @route   GET /api/v1/enrollments/pending
 // @desc    Get pending enrollment requests
 // @access  Private/Admin or Faculty

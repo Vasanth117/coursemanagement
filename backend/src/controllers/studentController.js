@@ -34,26 +34,33 @@ exports.getDashboard = asyncHandler(async (req, res, next) => {
       .limit(3)
       .populate('course', 'title code faculty department')
       .populate('faculty', 'name'),
-    Grade.find({ 
-      student: studentId,
-      assignment: { 
-        $in: await Assignment.find({ 
-          dueDate: { $gte: new Date() },
-          isPublished: true 
-        }).distinct('_id') 
-      },
-      status: 'pending'
-    })
-      .populate('assignment', 'title dueDate course maxPoints')
-      .populate({
-        path: 'assignment',
-        populate: {
-          path: 'course',
-          select: 'title code'
-        }
+    (async () => {
+      const enrolledCourseIds = await Enrollment.find({ 
+        student: studentId, 
+        status: 'enrolled' 
+      }).distinct('course');
+      
+      const assignments = await Assignment.find({
+        course: { $in: enrolledCourseIds },
+        isPublished: true,
+        dueDate: { $gte: new Date() }
       })
-      .sort('assignment.dueDate')
-      .limit(5),
+      .populate('course', 'title code')
+      .sort('dueDate')
+      .limit(5);
+
+      return Promise.all(assignments.map(async (assignment) => {
+        const submission = await Grade.findOne({
+          student: studentId,
+          assignment: assignment._id
+        });
+        
+        return {
+          assignment,
+          status: submission ? submission.status : 'pending'
+        };
+      }));
+    })(),
     Grade.find({ 
       student: studentId,
       status: 'graded'
@@ -300,7 +307,7 @@ exports.unenrollFromCourse = asyncHandler(async (req, res, next) => {
   });
 
   // Delete enrollment
-  await enrollment.remove();
+  await enrollment.deleteOne();
 
   res.status(200).json({
     success: true,
@@ -401,23 +408,32 @@ function getLetterGrade(percentage) {
 exports.getAssignments = asyncHandler(async (req, res, next) => {
   const studentId = req.user.id;
   const courseId = req.params.id;
+  let assignmentQuery = { isPublished: true };
 
-  // Check if student is enrolled
-  const enrollment = await Enrollment.findOne({
-    student: studentId,
-    course: courseId,
-    status: { $in: ['enrolled', 'completed'] }
-  });
+  if (courseId) {
+    // Check if student is enrolled in specific course
+    const enrollment = await Enrollment.findOne({
+      student: studentId,
+      course: courseId,
+      status: { $in: ['enrolled', 'completed'] }
+    });
 
-  if (!enrollment) {
-    return next(new ErrorResponse('Not enrolled in this course', 403));
+    if (!enrollment) {
+      return next(new ErrorResponse('Not enrolled in this course', 403));
+    }
+    assignmentQuery.course = courseId;
+  } else {
+    // Get all assignments for all enrolled courses
+    const enrolledCourses = await Enrollment.find({
+      student: studentId,
+      status: 'enrolled'
+    }).distinct('course');
+    assignmentQuery.course = { $in: enrolledCourses };
   }
 
   // Get published assignments
-  const assignments = await Assignment.find({
-    course: courseId,
-    isPublished: true
-  })
+  const assignments = await Assignment.find(assignmentQuery)
+    .populate('course', 'title code')
     .sort('dueDate')
     .select('title description dueDate type maxPoints weightage attachments allowLateSubmission');
 

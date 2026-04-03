@@ -60,7 +60,7 @@ const NotificationBell = () => {
                   key={notification._id}
                   onClick={() => handleMarkAsRead(notification._id)}
                   className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 ${
-                    !notification.read ? 'bg-blue-50' : ''
+                    !notification.isRead ? 'bg-blue-50' : ''
                   }`}
                 >
                   <div className="flex items-start space-x-3">
@@ -71,7 +71,7 @@ const NotificationBell = () => {
                         {new Date(notification.createdAt).toLocaleDateString()}
                       </p>
                     </div>
-                    {!notification.read && (
+                    {!notification.isRead && (
                       <div className="w-2 h-2 bg-blue-600 rounded-full mt-1"></div>
                     )}
                   </div>

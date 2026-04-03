@@ -9,9 +9,10 @@ export const NotificationProvider = ({ children }) => {
 
   const fetchNotifications = async () => {
     try {
-      const data = await studentAPI.getNotifications();
-      setNotifications(data);
-      setUnreadCount(data.filter(n => !n.read).length);
+      const response = await studentAPI.getNotifications();
+      const notificationsData = response.data || [];
+      setNotifications(notificationsData);
+      setUnreadCount(notificationsData.filter(n => !n.isRead).length);
     } catch (error) {
       console.error('Failed to fetch notifications');
     }
@@ -20,7 +21,7 @@ export const NotificationProvider = ({ children }) => {
   const markAsRead = async (id) => {
     try {
       await studentAPI.markNotificationRead(id);
-      setNotifications(prev => prev.map(n => n._id === id ? { ...n, read: true } : n));
+      setNotifications(prev => prev.map(n => n._id === id ? { ...n, isRead: true } : n));
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (error) {
       console.error('Failed to mark notification as read');

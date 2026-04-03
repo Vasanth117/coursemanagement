@@ -22,13 +22,41 @@ const GradeSchema = new mongoose.Schema({
   },
   score: {
     type: Number,
-    required: [true, 'Please add a score'],
     min: [0, 'Score cannot be negative']
   },
   maxScore: {
     type: Number,
-    required: [true, 'Please add maximum score'],
     min: [1, 'Maximum score must be at least 1']
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'submitted', 'graded', 'returned', 'late'],
+    default: 'pending'
+  },
+  submittedAt: {
+    type: Date
+  },
+  textSubmission: {
+    type: String
+  },
+  files: [{
+    fileName: String,
+    fileUrl: String,
+    fileSize: Number,
+    mimeType: String,
+    publicId: String,
+    uploadedAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
+  isLate: {
+    type: Boolean,
+    default: false
+  },
+  latePenalty: {
+    type: Number,
+    default: 0
   },
   percentage: {
     type: Number,
@@ -49,12 +77,10 @@ const GradeSchema = new mongoose.Schema({
   },
   gradedBy: {
     type: mongoose.Schema.ObjectId,
-    ref: 'User',
-    required: [true, 'Please add grader']
+    ref: 'User'
   },
   gradedAt: {
-    type: Date,
-    default: Date.now
+    type: Date
   },
   updatedAt: {
     type: Date,

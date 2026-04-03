@@ -1,4 +1,4 @@
-const { User, Course, Enrollment, Assignment, Grade } = require('../models');
+const { User, Course, Enrollment, Assignment, Grade, AuditLog } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/ErrorResponse');
 
@@ -222,7 +222,7 @@ exports.deleteUser = asyncHandler(async (req, res, next) => {
     }
   }
 
-  await user.remove();
+  await user.deleteOne();
 
   res.status(200).json({
     success: true,
@@ -667,5 +667,87 @@ exports.getReports = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     data: reports
+  });
+});
+
+// @desc    Get system audit logs
+// @route   GET /api/v1/admin/logs
+// @access  Private/Admin
+exports.getAuditLogs = asyncHandler(async (req, res, next) => {
+  const { module, action, status, page = 1, limit = 50 } = req.query;
+  const skip = (page - 1) * limit;
+
+  const filter = {};
+  if (module) filter.module = module;
+  if (action) filter.action = action;
+  if (status) filter.status = status;
+
+  const logs = await AuditLog.find(filter)
+    .populate('user', 'name email role')
+    .sort('-createdAt')
+    .skip(skip)
+    .limit(parseInt(limit));
+
+  const total = await AuditLog.countDocuments(filter);
+
+  res.status(200).json({
+    success: true,
+    count: logs.length,
+    pagination: {
+      total,
+      page: parseInt(page),
+      pages: Math.ceil(total / limit)
+    },
+    data: logs
+  });
+});
+
+// @desc    Get system security data
+// @route   GET /api/v1/admin/security
+// @access  Private/Admin
+exports.getSecurityData = asyncHandler(async (req, res, next) => {
+  const [
+    failedLogins,
+    unauthorizedAccess,
+    activeAdmins,
+    recentSecurityEvents
+  ] = await Promise.all([
+    AuditLog.countDocuments({ action: 'unauthorized_access' }),
+    AuditLog.countDocuments({ module: 'security', status: 'failure' }),
+    User.countDocuments({ role: 'admin', isActive: true }),
+    AuditLog.find({ module: 'security' })
+      .populate('user', 'name email')
+      .sort('-createdAt')
+      .limit(10)
+  ]);
+
+  // Mock some security metrics
+  const securityMetrics = {
+    failedLogins24h: await AuditLog.countDocuments({ 
+      action: 'login', 
+      status: 'failure',
+      createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }
+    }),
+    mfaEnabledUsers: await User.countDocuments({ mfaEnabled: true }),
+    totalUsers: await User.countDocuments()
+  };
+
+  res.status(200).json({
+    success: true,
+    data: {
+      stats: {
+        failedLogins,
+        unauthorizedAccess,
+        activeAdmins,
+        mfaEnabledUsers: securityMetrics.mfaEnabledUsers
+      },
+      recentEvents: recentSecurityEvents,
+      metrics: {
+        ...securityMetrics,
+        mfaPercentage: securityMetrics.totalUsers > 0 
+          ? Math.round((securityMetrics.mfaEnabledUsers / securityMetrics.totalUsers) * 100) 
+          : 0
+      }
+    }
   });
 });

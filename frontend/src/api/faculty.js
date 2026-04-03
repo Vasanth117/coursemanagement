@@ -107,7 +107,7 @@ export const facultyAPI = {
   // Announcements
   getAnnouncements: async (params = {}) => {
     const response = await api.get('/faculty/announcements', { params });
-    return response.data;
+    return Array.isArray(response.data) ? response.data : response.data?.data || [];
   },
 
   createAnnouncement: async (announcementData) => {
@@ -118,7 +118,7 @@ export const facultyAPI = {
   // Resources
   getResources: async (courseId) => {
     const response = await api.get(`/faculty/courses/${courseId}/resources`);
-    return response.data;
+    return response.data?.resources || response.data?.data || response.data || [];
   },
 
   uploadResource: async (courseId, formData) => {

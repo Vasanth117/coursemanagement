@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { facultyAPI } from '../../../api/faculty';
 import { FiMail, FiPhone, FiBook, FiFileText, FiTrendingUp, FiCalendar } from 'react-icons/fi';
-import { LoadingSpinner, Card, Avatar, Badge, Tabs, ProgressBar } from '../../../components/common';
+import { LoadingSpinner, Card, Avatar, Badge, Tabs, ProgressBar, ErrorMessage } from '../../../components/common';
 
 const StudentDetails = () => {
   const { id } = useParams();
@@ -14,13 +14,10 @@ const StudentDetails = () => {
     queryFn: () => facultyAPI.getStudentById(id)
   });
 
-  const { data: performance } = useQuery({
-    queryKey: ['studentPerformance', id],
-    queryFn: () => facultyAPI.getStudentPerformance(id),
-    enabled: !!id
-  });
+  const performance = student?.performance;
 
   if (isLoading) return <LoadingSpinner />;
+  if (!student) return <ErrorMessage message="Student not found or access denied" />;
 
   const tabs = [
     { id: 'overview', label: 'Overview' },
@@ -39,9 +36,8 @@ const StudentDetails = () => {
             <h1 className="text-3xl font-bold text-gray-900">{student.name}</h1>
             <p className="text-gray-600 mt-1">{student.email}</p>
             <div className="flex flex-wrap gap-3 mt-3">
-              <Badge variant="primary">{student.rollNumber}</Badge>
+              <Badge variant="primary">{student.studentId}</Badge>
               <Badge variant="success">{student.department}</Badge>
-              <Badge variant="default">{student.semester} Semester</Badge>
             </div>
           </div>
         </div>

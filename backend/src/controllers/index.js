@@ -10,6 +10,7 @@ const gradeController = require('./gradeController');
 const resourceController = require('./resourceController');
 const studentController = require('./studentController');
 const submissionController = require('./submissionController');
+const notificationController = require('./notificationController');
 
 module.exports = {
   adminController,
@@ -23,5 +24,6 @@ module.exports = {
   gradeController,
   resourceController,
   studentController,
-  submissionController
+  submissionController,
+  notificationController
 };

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, Link } from 'react-router-dom';
 import { studentAPI } from '../../../api/student';
-import { FiBook, FiFileText, FiDownload, FiCalendar, FiClock, FiMapPin, FiUser } from 'react-icons/fi';
+import { FiBook, FiFileText, FiDownload, FiCalendar, FiClock, FiMapPin, FiUser, FiPlay, FiEye } from 'react-icons/fi';
 import { LoadingSpinner, Card, Badge, Button, Tabs } from '../../../components/common';
 
 const CourseDetails = () => {
@@ -59,6 +59,18 @@ const CourseDetails = () => {
             <Badge variant="primary">{course?.courseCode || course?.code || 'N/A'}</Badge>
           </div>
           <p className="text-gray-600">{course?.department || 'N/A'} • {course?.credits || 'N/A'} Credits</p>
+        </div>
+        <div className="flex gap-3">
+          {course?.isEnrolled && (
+            <Link to={`/student/courses/${id}/learning`}>
+              <Button variant="primary" icon={FiPlay}>Resume Learning</Button>
+            </Link>
+          )}
+          {!course?.isEnrolled && (
+            <Link to={`/student/courses/${id}/enroll`}>
+              <Button variant="primary">Enroll Now</Button>
+            </Link>
+          )}
         </div>
       </div>
 

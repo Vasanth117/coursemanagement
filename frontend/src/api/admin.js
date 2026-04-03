@@ -7,7 +7,7 @@ export const adminAPI = {
     return response.data;
   },
 
-  // Users Management
+  // Users Ma
   getUsers: async (params = {}) => {
     const response = await api.get('/admin/users', { params });
     return response.data;

@@ -7,6 +7,8 @@ const Grade = require('./Grade');
 const Announcement = require('./Announcement');
 const Resource = require('./Resource');
 const Attendance = require('./Attendance');
+const AuditLog = require('./AuditLog');
+const Notification = require('./Notification');
 
 module.exports = {
   User,
@@ -17,5 +19,7 @@ module.exports = {
   Grade,
   Announcement,
   Resource,
-  Attendance
+  Attendance,
+  AuditLog,
+  Notification
 };
