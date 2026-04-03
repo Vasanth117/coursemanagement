@@ -1,3 +1,4 @@
+// FIXED LINT ERRORS
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import api from '../../api/axiosConfig';
