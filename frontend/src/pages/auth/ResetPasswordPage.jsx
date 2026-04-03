@@ -8,9 +8,9 @@ const ResetPasswordPage = () => {
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-10">
           <div className="w-32 h-32 bg-white rounded-3xl flex items-center justify-center shadow-xl mb-6 p-4 border border-gray-100">
-            <img src="/images/sece-logo.png" alt="SECE Logo" className="w-full h-full object-contain" />
+            <img src="/Isaii-logo.avif" alt="Isaii Logo" className="w-full h-full object-contain" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">SECE Course Management</h1>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Isaii Learning Management System</h1>
         </div>
 
         <div className="bg-white rounded-3xl shadow-2xl p-10 border border-gray-100 animate-fade-in">

@@ -1,7 +1,7 @@
 {
-  "name": "course-management-system",
+  "name": "learning-management-system",
   "version": "1.0.0",
-  "description": "Course Management System Backend API",
+  "description": "Learning Management System Backend API",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",

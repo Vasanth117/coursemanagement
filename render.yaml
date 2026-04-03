@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: isaii-lms-backend
+    env: node
+    buildCommand: npm install
+    startCommand: node src/server.js
+    rootDirectory: backend
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: CLIENT_URL
+        sync: false

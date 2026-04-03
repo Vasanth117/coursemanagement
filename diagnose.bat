@@ -1,6 +1,6 @@
 @echo off
 echo ========================================
-echo   Course Management System Diagnostics
+echo   Learning Management System Diagnostics
 echo ========================================
 echo.
 

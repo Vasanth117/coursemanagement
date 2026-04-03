@@ -20,6 +20,16 @@ const SubmissionSchema = new mongoose.Schema({
     type: String,
     maxlength: [5000, 'Content cannot be more than 5000 characters']
   },
+  answers: [{
+    questionIndex: Number,
+    answerText: String,
+    isCorrect: Boolean,
+    marks: Number
+  }],
+  score: {
+    type: Number,
+    default: 0
+  },
   attachments: [{
     filename: String,
     originalName: String,

@@ -7,6 +7,7 @@ import { toast } from 'react-hot-toast';
 import UserTypeTabs from './components/UserTypeTabs';
 import GoogleLoginButton from './components/GoogleLoginButton';
 import { EyeIcon, EyeSlashIcon, AcademicCapIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
+import isaiiLogo from '../../assets/images/Isaii-logo.png';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -77,7 +78,7 @@ const LoginPage = () => {
   const handleGoogleSuccess = async (response) => {
     try {
       const email = response.profileObj.email;
-      const collegeDomain = 'sece.ac.in';
+      const collegeDomain = 'isaii.ai';
       
       // Validate college email
       if (!email.endsWith(`@${collegeDomain}`)) {
@@ -130,10 +131,10 @@ const LoginPage = () => {
         {/* College Logo & Name */}
         <div className="relative z-10 flex flex-col items-center text-center">
           <div className="w-64 h-64 bg-white rounded-3xl flex items-center justify-center shadow-2xl p-6 mb-8">
-            <img src="/images/sece-logo.png" alt="SECE Logo" className="w-full h-full object-contain" />
+            <img src={isaiiLogo} alt="Isaii Logo" className="w-full h-full object-contain" />
           </div>
-          <h1 className="text-4xl font-bold text-white tracking-tight mb-3">Sri Eshwar College of Engineering</h1>
-          <p className="text-xl text-blue-100 font-medium">Course Management System</p>
+          <h1 className="text-4xl font-bold text-white tracking-tight mb-3">Isaii Learning Management System</h1>
+          <p className="text-xl text-blue-100 font-medium">Learning Management System</p>
         </div>
       </div>
 
@@ -143,10 +144,10 @@ const LoginPage = () => {
           {/* Mobile Logo */}
           <div className="lg:hidden flex flex-col items-center mb-10">
             <div className="w-40 h-40 bg-white rounded-3xl flex items-center justify-center shadow-xl mb-6 p-4 border border-gray-100">
-              <img src="/images/sece-logo.png" alt="SECE Logo" className="w-full h-full object-contain" />
+              <img src={isaiiLogo} alt="Isaii Logo" className="w-full h-full object-contain" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Sri Eshwar College of Engineering</h1>
-            <p className="text-gray-600 text-lg mt-2 font-medium">Course Management System</p>
+            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Isaii Learning Management System</h1>
+            <p className="text-gray-600 text-lg mt-2 font-medium">Learning Management System</p>
           </div>
 
           {/* Login Card */}
@@ -176,7 +177,7 @@ const LoginPage = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    placeholder="vasanth.m@sece.ac.in"
+                    placeholder="vasanth.m@isaii.ai"
                     className="w-full px-4 py-3 pl-11 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     required
                   />

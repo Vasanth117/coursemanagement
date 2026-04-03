@@ -1,5 +1,4 @@
 import React from 'react';
-import { FiHeart } from 'react-icons/fi';
 
 const Footer = () => {
   return (
@@ -7,7 +6,7 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-6 py-6">
         <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
           <div className="flex items-center space-x-2 text-sm text-gray-600">
-            <span>© 2025 Sri Eshwar College of Engineering.</span>
+            <span>© 2025 Isaii AI.</span>
             <span><i> @ vasanth</i></span>
             <span className="hidden md:inline">All rights reserved.</span>
           </div>
@@ -15,9 +14,9 @@ const Footer = () => {
         
 
           <div className="flex items-center space-x-6 text-sm">
-            <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">Privacy</a>
-            <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">Terms</a>
-            <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">Support</a>
+            <a href="/privacy" className="text-gray-600 hover:text-blue-600 transition-colors">Privacy</a>
+            <a href="/terms" className="text-gray-600 hover:text-blue-600 transition-colors">Terms</a>
+            <a href="/support" className="text-gray-600 hover:text-blue-600 transition-colors">Support</a>
           </div>
         </div>
       </div>

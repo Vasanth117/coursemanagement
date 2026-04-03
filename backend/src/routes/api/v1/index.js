@@ -12,6 +12,7 @@ const announcementRoutes = require('./announcementRoutes');
 const resourceRoutes = require('./resourceRoutes');
 const attendanceRoutes = require('./attendanceRoutes');
 const notificationRoutes = require('./notificationRoutes');
+const lessonRoutes = require('./lessonRoutes');
 
 const router = express.Router();
 
@@ -19,7 +20,7 @@ const router = express.Router();
 router.get('/', (req, res) => {
   res.json({
     success: true,
-    message: 'Course Management System API v1',
+    message: 'Learning Management System API v1',
     version: '1.0.0',
     endpoints: {
       auth: '/api/v1/auth',
@@ -46,5 +47,6 @@ router.use('/announcements', announcementRoutes);
 router.use('/resources', resourceRoutes);
 router.use('/attendance', attendanceRoutes);
 router.use('/notifications', notificationRoutes);
+router.use('/lessons', lessonRoutes);
 
 module.exports = router;

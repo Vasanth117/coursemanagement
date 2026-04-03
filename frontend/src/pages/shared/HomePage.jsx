@@ -1,13 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FiBook, FiUsers, FiAward, FiTrendingUp, FiCheckCircle, FiArrowRight } from 'react-icons/fi';
+import isaiiLogo from '../../assets/images/Isaii-logo.png';
 
 const HomePage = () => {
   const features = [
     {
       icon: FiBook,
-      title: 'Course Management',
-      description: 'Comprehensive course creation, enrollment, and management system',
+      title: 'Learning Management',
+      description: 'Comprehensive course creation, enrollment, and lesson management system',
       color: 'blue'
     },
     {
@@ -44,10 +45,10 @@ const HomePage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <img src="/images/sece-logo.png" alt="SECE Logo" className="h-16 w-16 object-contain" />
+              <img src={isaiiLogo} alt="Isaii Logo" className="h-16 w-16 object-contain" />
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">SECE</h1>
-                <p className="text-sm text-gray-600">Sri Eshwar College of Engineering</p>
+                <h1 className="text-2xl font-bold text-gray-900">Isaii</h1>
+                <p className="text-sm text-gray-600">Advanced AI Education</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -68,10 +69,10 @@ const HomePage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="animate-fade-in">
               <h1 className="text-5xl font-bold text-gray-900 mb-6 leading-tight">
-                Welcome to <span className="text-blue-600">SECE</span> Course Management System
+                Welcome to <span className="text-blue-600">Isaii</span> Learning Management System
               </h1>
               <p className="text-xl text-gray-600 mb-8">
-                A comprehensive platform for managing courses, assignments, grades, and academic activities at Sri Eshwar College of Engineering.
+                A comprehensive AI-powered platform for managing courses, assignments, and advanced educational delivery.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/register" className="px-8 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition shadow-lg hover:shadow-xl font-semibold text-center flex items-center justify-center space-x-2">
@@ -200,13 +201,13 @@ const HomePage = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-3 mb-4">
-                <img src="/images/sece-logo.png" alt="SECE" className="h-12 w-12" />
+                <img src={isaiiLogo} alt="Isaii" className="h-12 w-12" />
                 <div>
-                  <h3 className="font-bold text-lg">SECE</h3>
-                  <p className="text-sm text-gray-400">Course Management</p>
+                  <h3 className="font-bold text-lg">Isaii</h3>
+                  <p className="text-sm text-gray-400">Learning Management System</p>
                 </div>
               </div>
-              <p className="text-gray-400 text-sm">Sri Eshwar College of Engineering - Empowering education through technology</p>
+              <p className="text-gray-400 text-sm">Isaii Learning Management System - Empowering education through AI technology</p>
             </div>
             <div>
               <h4 className="font-bold mb-4">Quick Links</h4>
@@ -227,14 +228,14 @@ const HomePage = () => {
             <div>
               <h4 className="font-bold mb-4">Contact</h4>
               <ul className="space-y-2 text-gray-400 text-sm">
-                <li>Email: info@sece.edu</li>
+                <li>Email: info@isaii.ai</li>
                 <li>Phone: +91 123 456 7890</li>
                 <li>Address: Coimbatore, Tamil Nadu</li>
               </ul>
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400 text-sm">
-            <p>&copy; 2024 Sri Eshwar College of Engineering. All rights reserved.</p>
+            <p>&copy; 2024 Isaii AI. All rights reserved.</p>
           </div>
         </div>
       </footer>

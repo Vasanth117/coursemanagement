@@ -16,6 +16,12 @@ const EnrollmentSchema = new mongoose.Schema({
     enum: ['pending', 'enrolled', 'completed', 'dropped', 'rejected'],
     default: 'pending'
   },
+  progress: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 100
+  },
   enrolledAt: {
     type: Date,
     default: Date.now

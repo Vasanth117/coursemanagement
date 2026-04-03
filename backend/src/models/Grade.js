@@ -20,6 +20,12 @@ const GradeSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: 'Submission'
   },
+  answers: [{
+    questionIndex: Number,
+    answerText: String,
+    isCorrect: Boolean,
+    marks: Number
+  }],
   score: {
     type: Number,
     min: [0, 'Score cannot be negative']

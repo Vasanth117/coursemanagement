@@ -1,6 +1,7 @@
 import React from 'react';
 import { FiX } from 'react-icons/fi';
 import SidebarItem from './SidebarItem';
+import isaiiLogo from '../../../assets/images/Isaii-logo.png';
 
 const Sidebar = ({ isOpen, onClose, items, logo = true }) => {
   return (
@@ -27,10 +28,10 @@ const Sidebar = ({ isOpen, onClose, items, logo = true }) => {
         <div className="flex items-center justify-between p-6 border-b border-blue-500">
           {logo && (
             <div className="flex items-center space-x-3">
-              <img src="/images/sece-logo.png" alt="SECE" className="w-10 h-10 rounded-lg bg-white p-1" />
+              <img src={isaiiLogo} alt="Isaii" className="w-10 h-10 rounded-lg bg-white p-1" />
               <div>
-                <h2 className="text-white font-bold text-lg">SECE</h2>
-                <p className="text-blue-200 text-xs">Course Management</p>
+                <h2 className="text-white font-bold text-lg">Isaii</h2>
+                <p className="text-blue-200 text-xs text-nowrap">Learning Management System</p>
               </div>
             </div>
           )}
@@ -53,7 +54,7 @@ const Sidebar = ({ isOpen, onClose, items, logo = true }) => {
 
         {/* Footer */}
         <div className="p-4 border-t border-blue-500">
-          <p className="text-xs text-blue-200 text-center">© 2024 SECE. All rights reserved.</p>
+          <p className="text-xs text-blue-200 text-center">© 2024 Isaii AI. All rights reserved.</p>
         </div>
       </aside>
     </>

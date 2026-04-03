@@ -12,6 +12,23 @@ const AssignmentSchema = new mongoose.Schema({
     required: [true, 'Please add a description'],
     maxlength: [1000, 'Description cannot be more than 1000 characters']
   },
+  questions: [{
+    questionText: {
+      type: String,
+      required: true
+    },
+    questionType: {
+      type: String,
+      enum: ['multiple-choice', 'true-false', 'short-answer', 'essay'],
+      default: 'multiple-choice'
+    },
+    options: [String],
+    correctAnswer: String,
+    points: {
+      type: Number,
+      default: 1
+    }
+  }],
   course: {
     type: mongoose.Schema.ObjectId,
     ref: 'Course',

@@ -1,6 +1,6 @@
 @echo off
 echo ========================================
-echo   Course Management System Startup
+echo   Learning Management System Startup
 echo ========================================
 echo.
 
