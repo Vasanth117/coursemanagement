@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { FiSearch, FiEye, FiCheckCircle, FiXCircle } from 'react-icons/fi';
-import { Card, Table, InputField, SelectField, Badge, PrimaryButton, SecondaryButton, LoadingSpinner, EmptyState } from '../../../components/common';
+import { Card, Table, InputField, SelectField, Badge, PrimaryButton, LoadingSpinner, EmptyState } from '../../../components/common';
 import { adminAPI } from '../../../api/admin';
 
 const CoursesManagement = () => {
@@ -13,7 +13,7 @@ const CoursesManagement = () => {
   const [statusFilter, setStatusFilter] = useState('all');
 
   // Fetch courses
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['admin-courses', statusFilter, searchTerm],
     queryFn: () => adminAPI.getAllCourses({ 
       status: statusFilter !== 'all' ? statusFilter : undefined,

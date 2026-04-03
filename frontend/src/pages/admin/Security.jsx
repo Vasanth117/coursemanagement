@@ -5,7 +5,6 @@ import {
   FiShield, 
   FiLock, 
   FiKey, 
-  FiUsers, 
   FiAlertTriangle, 
   FiSettings, 
   FiShieldOff, 
@@ -22,8 +21,6 @@ import {
   Card, 
   Badge, 
   Button, 
-  Grid,
-  Modal,
   Table,
   EmptyState
 } from '../../components/common';

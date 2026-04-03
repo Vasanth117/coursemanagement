@@ -1,15 +1,14 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { FiArrowLeft, FiEdit, FiTrash, FiMail, FiPhone, FiCalendar } from 'react-icons/fi';
-import { Card, Badge, Avatar, PrimaryButton, SecondaryButton, Tabs, LoadingSpinner } from '../../../components/common';
+import { Card, Badge, Avatar, SecondaryButton, Tabs, LoadingSpinner } from '../../../components/common';
 import { adminAPI } from '../../../api/admin';
 
 const UserDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = React.useState('overview');
 
   // Fetch user details
