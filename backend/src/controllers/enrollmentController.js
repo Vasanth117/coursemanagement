@@ -125,6 +125,12 @@ exports.getEnrollments = asyncHandler(async (req, res, next) => {
   // Base query
   query = Enrollment.find(JSON.parse(queryStr));
 
+  // Filter by faculty courses if faculty param provided
+  if (req.query.faculty) {
+    const facultyCourses = await Course.find({ faculty: req.query.faculty }).distinct('_id');
+    query = Enrollment.find({ ...JSON.parse(queryStr), course: { $in: facultyCourses } });
+  }
+
   // Select fields
   if (req.query.select) {
     const fields = req.query.select.split(',').join(' ');

@@ -1,10 +1,10 @@
 export const settings = {
   app: {
-    name: 'Isaii Learning Management System',
-    shortName: 'Isaii LMS',
+    name: 'Sri Eshwar College of Engineering',
+    shortName: 'SECE CMS',
     version: '1.0.0',
-    description: 'Advanced AI-powered Learning Management System',
-    logo: '/Isaii-logo.png'
+    description: 'Advanced Course Management System for SECE',
+    logo: '/college-logo.png'
   },
   
   api: {

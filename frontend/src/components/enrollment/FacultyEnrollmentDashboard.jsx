@@ -4,28 +4,40 @@ import { useSelector } from 'react-redux';
 import { FiUsers, FiBook, FiClock } from 'react-icons/fi';
 import useWebSocket from '../../hooks/useWebSocket';
 import api from '../../api/axiosConfig';
-import { facultyAPI } from '../../api/faculty';
 
 const FacultyEnrollmentDashboard = () => {
   const { user } = useSelector((state) => state.auth);
-  
-  // Initialize WebSocket for real-time updates
+
   useWebSocket();
 
-  const { data: courses } = useQuery({
+  const { data: coursesData } = useQuery({
     queryKey: ['facultyCourses', user?.id],
-    queryFn: () => facultyAPI.getCourses(),
-    refetchInterval: 5000
+    queryFn: async () => {
+      const res = await api.get(`/courses?faculty=${user.id}`);
+      return res;
+    },
+    enabled: !!user?.id,
+    refetchInterval: 3000
   });
 
-  const { data: courseEnrollments } = useQuery({
+  const { data: enrollmentData } = useQuery({
     queryKey: ['facultyEnrollments', user?.id],
     queryFn: async () => {
-      const response = await api.get(`/faculty/${user.id}/enrollments`);
-      return response.data;
+      const res = await api.get(`/enrollments?faculty=${user.id}&sort=-enrolledAt&limit=50`);
+      return res;
     },
-    refetchInterval: 5000
+    enabled: !!user?.id,
+    refetchInterval: 3000,
+    refetchOnWindowFocus: true
   });
+
+  const courses = coursesData?.data || [];
+  const enrollments = enrollmentData?.data || [];
+  const total = enrollmentData?.count || 0;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayCount = enrollments.filter(e => new Date(e.enrolledAt) >= today).length;
 
   return (
     <div className="space-y-6">
@@ -36,7 +48,7 @@ const FacultyEnrollmentDashboard = () => {
             <FiBook className="h-8 w-8 text-blue-600" />
             <div className="ml-4">
               <p className="text-sm text-gray-600">My Courses</p>
-              <p className="text-2xl font-bold">{courses?.length || 0}</p>
+              <p className="text-2xl font-bold">{courses.length}</p>
             </div>
           </div>
         </div>
@@ -46,7 +58,7 @@ const FacultyEnrollmentDashboard = () => {
             <FiUsers className="h-8 w-8 text-green-600" />
             <div className="ml-4">
               <p className="text-sm text-gray-600">Total Enrollments</p>
-              <p className="text-2xl font-bold">{courseEnrollments?.total || 0}</p>
+              <p className="text-2xl font-bold">{total}</p>
             </div>
           </div>
         </div>
@@ -56,34 +68,43 @@ const FacultyEnrollmentDashboard = () => {
             <FiClock className="h-8 w-8 text-yellow-600" />
             <div className="ml-4">
               <p className="text-sm text-gray-600">Today's Enrollments</p>
-              <p className="text-2xl font-bold">{courseEnrollments?.today || 0}</p>
+              <p className="text-2xl font-bold">{todayCount}</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Course Enrollments */}
+      {/* Enrollment List */}
       <div className="bg-white rounded-lg shadow">
-        <div className="p-6 border-b">
-          <h3 className="text-lg font-medium">Recent Student Enrollments</h3>
-          <p className="text-sm text-gray-500">Real-time updates when students enroll in your courses</p>
+        <div className="p-6 border-b flex justify-between items-center">
+          <div>
+            <h3 className="text-lg font-medium">Student Enrollments</h3>
+            <p className="text-sm text-gray-500">Real-time updates every 3 seconds</p>
+          </div>
+          <div className="flex items-center text-sm text-green-600">
+            <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+            Live
+          </div>
         </div>
+
         <div className="p-6">
-          {courseEnrollments?.enrollments?.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">No enrollments yet</p>
+          {enrollments.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500 mb-2">No enrollments yet</p>
+              <div className="flex items-center justify-center text-sm text-green-600">
+                <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+                Watching for new enrollments...
+              </div>
+            </div>
           ) : (
             <div className="space-y-4">
-              {courseEnrollments?.enrollments?.map((enrollment) => (
-                <div key={enrollment._id} className="border rounded-lg p-4 hover:bg-gray-50">
+              {enrollments.map((enrollment) => (
+                <div key={enrollment._id} className="border rounded-lg p-4 hover:bg-gray-50 transition">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h4 className="font-medium text-gray-900">
-                        {enrollment.student?.name}
-                      </h4>
-                      <p className="text-sm text-gray-600">
-                        {enrollment.student?.email} • {enrollment.student?.studentId}
-                      </p>
-                      <p className="text-sm font-medium text-blue-600">
+                      <h4 className="font-medium text-gray-900">{enrollment.student?.name}</h4>
+                      <p className="text-sm text-gray-600">{enrollment.student?.email} • {enrollment.student?.studentId}</p>
+                      <p className="text-sm font-medium text-blue-600 mt-1">
                         {enrollment.course?.title} ({enrollment.course?.code})
                       </p>
                     </div>
@@ -96,13 +117,12 @@ const FacultyEnrollmentDashboard = () => {
                         {enrollment.status}
                       </span>
                       <p className="text-xs text-gray-500 mt-1">
-                        {new Date(enrollment.enrolledAt).toLocaleString()}
+                        {new Date(enrollment.enrolledAt).toLocaleDateString()}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {new Date(enrollment.enrolledAt).toLocaleTimeString()}
                       </p>
                     </div>
-                  </div>
-                  
-                  <div className="mt-3 text-xs text-gray-500">
-                    Enrolled {Math.floor((new Date() - new Date(enrollment.enrolledAt)) / (1000 * 60))} minutes ago
                   </div>
                 </div>
               ))}

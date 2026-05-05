@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { RegisterForm, RoleSelector } from '../../components/auth';
 import { FiShield } from 'react-icons/fi';
-import isaiiLogo from '../../assets/images/Isaii-logo.png';
+import collegeLogo from '../../assets/images/college-logo.png';
 
 const RegisterPage = () => {
   const [selectedRole, setSelectedRole] = useState('student');
@@ -18,12 +18,12 @@ const RegisterPage = () => {
 
         <div className="relative z-10 flex flex-col items-center text-center">
           <div className="w-64 h-64 bg-white rounded-3xl flex items-center justify-center shadow-2xl p-6 mb-8">
-            <img src={isaiiLogo} alt="Isaii Logo" className="w-full h-full object-contain" />
+            <img src={collegeLogo} alt="SECE Logo" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-4xl font-bold text-white tracking-tight mb-3">
-            Isaii AI
+            Sri Eshwar College
           </h1>
-          <p className="text-xl text-blue-100 font-medium">Learning Management System</p>
+          <p className="text-xl text-blue-100 font-medium">Course Management System</p>
         </div>
       </div>
 
@@ -33,12 +33,12 @@ const RegisterPage = () => {
           {/* Mobile Logo */}
           <div className="lg:hidden flex flex-col items-center mb-10">
             <div className="w-40 h-40 bg-white rounded-3xl flex items-center justify-center shadow-xl mb-6 p-4 border border-gray-100">
-              <img src={isaiiLogo} alt="Isaii Logo" className="w-full h-full object-contain" />
+              <img src={collegeLogo} alt="SECE Logo" className="w-full h-full object-contain" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-              Isaii AI
+            <h1 className="text-3xl font-bold text-gray-900 tracking-tight text-center">
+              Sri Eshwar College
             </h1>
-            <p className="text-gray-600 text-lg mt-2 font-medium">Learning Management System</p>
+            <p className="text-gray-600 text-lg mt-2 font-medium">Course Management System</p>
           </div>
 
           {/* Register Card */}

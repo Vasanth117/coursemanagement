@@ -9,43 +9,41 @@ const useWebSocket = () => {
     const token = localStorage.getItem('token');
     if (!token) return;
 
-    const wsUrl = process.env.REACT_APP_WS_URL || 'ws://localhost:8000';
-    wsRef.current = new WebSocket(wsUrl);
+    const wsUrl = process.env.REACT_APP_WS_URL || 'ws://localhost:3001';
 
-    wsRef.current.onopen = () => {
-      wsRef.current.send(JSON.stringify({
-        type: 'auth',
-        token: token
-      }));
+    const connect = () => {
+      wsRef.current = new WebSocket(wsUrl);
+
+      wsRef.current.onopen = () => {
+        wsRef.current.send(JSON.stringify({ type: 'auth', token }));
+      };
+
+      wsRef.current.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+        if (message.type === 'enrollment_update') {
+          queryClient.invalidateQueries({ queryKey: ['studentEnrollments'] });
+          queryClient.invalidateQueries({ queryKey: ['facultyEnrollments'] });
+          queryClient.invalidateQueries({ queryKey: ['enrollmentStats'] });
+          queryClient.invalidateQueries({ queryKey: ['recentEnrollments'] });
+          queryClient.invalidateQueries({ queryKey: ['facultyCourses'] });
+        }
+      };
+
+      wsRef.current.onclose = () => {
+        // Reconnect after 3 seconds
+        setTimeout(connect, 3000);
+      };
+
+      wsRef.current.onerror = () => {
+        wsRef.current.close();
+      };
     };
 
-    wsRef.current.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      
-      switch (message.type) {
-        case 'enrollment_update':
-          queryClient.invalidateQueries(['enrollmentStats']);
-          queryClient.invalidateQueries(['recentEnrollments']);
-          queryClient.invalidateQueries(['studentEnrollments']);
-          queryClient.invalidateQueries(['facultyEnrollments']);
-          // Force immediate refetch
-          queryClient.refetchQueries(['studentEnrollments']);
-          break;
-        case 'stats_update':
-          queryClient.invalidateQueries(['enrollmentStats']);
-          break;
-        case 'new_assignment':
-          queryClient.invalidateQueries(['studentAssignments']);
-          queryClient.invalidateQueries(['upcomingAssignments']);
-          queryClient.invalidateQueries(['notifications']);
-          break;
-        default:
-          break;
-      }
-    };
+    connect();
 
     return () => {
       if (wsRef.current) {
+        wsRef.current.onclose = null;
         wsRef.current.close();
       }
     };
